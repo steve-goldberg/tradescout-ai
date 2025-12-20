@@ -22,6 +22,7 @@ export interface TradeIdea {
   invalidation: string;
   timeframe: string;
   riskLevel: RiskLevel;
+  chartImageUrl?: string;
 }
 
 export interface MarketAnalysis {

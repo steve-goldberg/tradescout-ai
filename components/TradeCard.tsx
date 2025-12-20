@@ -70,6 +70,18 @@ export const TradeCard: React.FC<TradeCardProps> = ({ idea }) => {
         </div>
       </div>
 
+      {/* Chart Image Section */}
+      {idea.chartImageUrl && (
+        <div className="border-b border-slate-800 bg-black/30">
+          <img
+            src={idea.chartImageUrl}
+            alt={`${idea.ticker} trade setup`}
+            className="w-full h-auto"
+            loading="lazy"
+          />
+        </div>
+      )}
+
       {/* Main Data Grid - Increased Sizes */}
       <div className="grid grid-cols-2 lg:grid-cols-4 divide-x divide-slate-800 border-b border-slate-800">
         

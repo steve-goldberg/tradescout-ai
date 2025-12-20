@@ -5,6 +5,7 @@ import { MarketAnalysisCard } from './components/MarketAnalysisCard';
 import { ApiKeyModal } from './components/ApiKeyModal';
 import { AnalysisLogStream } from './components/AnalysisLogStream';
 import { analyzeVideoForTrades } from './services/geminiService';
+import { generateChartsForTrades } from './services/chartImgService';
 import { getApiKey, setApiKey, hasApiKey, getAnalysisCount, incrementAnalysisCount } from './utils/apiKeyStorage';
 import { AnalysisResult } from './types';
 import { Cpu, Activity, ShieldAlert, Radio } from 'lucide-react';
@@ -24,7 +25,14 @@ const App: React.FC = () => {
 
     try {
       const data = await analyzeVideoForTrades(input, apiKey);
-      setResult(data);
+
+      // Enrich trades with chart images (parallel fetch)
+      const tradesWithCharts = await generateChartsForTrades(data.trades);
+
+      setResult({
+        ...data,
+        trades: tradesWithCharts
+      });
       setAnalysisCount(incrementAnalysisCount());
     } catch (err: any) {
       setError(err.message || "ANALYSIS_FAILED: CHECK_CONNECTION_AND_KEY");
