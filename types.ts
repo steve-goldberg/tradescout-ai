@@ -23,6 +23,7 @@ export interface TradeIdea {
   timeframe: string;
   riskLevel: RiskLevel;
   chartImageUrl?: string;
+  tradingViewSymbol?: string; // Chart-IMG compatible symbol (e.g., "BINANCE:BTCUSDT")
 }
 
 export interface MarketAnalysis {

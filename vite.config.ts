@@ -21,7 +21,8 @@ export default defineConfig(({ mode }) => {
         'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY),
         'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
         'process.env.CHART_IMG_API_KEY': JSON.stringify(env.CHART_IMG_API_KEY),
-        'process.env.SUPADATA_API_KEY': JSON.stringify(env.SUPADATA_API_KEY)
+        'process.env.SUPADATA_API_KEY': JSON.stringify(env.SUPADATA_API_KEY),
+        'import.meta.env.VITE_DEBUG': JSON.stringify(env.DEBUG || 'false')
       },
       resolve: {
         alias: {

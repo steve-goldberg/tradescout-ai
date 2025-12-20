@@ -1,4 +1,5 @@
-import { TradeIdea, TradeDirection } from '../types';
+import { TradeIdea } from '../types';
+import { debugLog } from '../utils/debugLogger';
 
 // Use Vite proxy to avoid CORS issues
 const API_BASE = '/api/chart-img/v2/tradingview/advanced-chart';
@@ -8,8 +9,10 @@ const API_BASE = '/api/chart-img/v2/tradingview/advanced-chart';
  * e.g., "BTC" -> "BINANCE:BTCUSDT", "BTC/USD" -> "BINANCE:BTCUSDT", "AAPL" -> "NASDAQ:AAPL"
  */
 const mapToSymbol = (ticker: string): string => {
-  // Normalize: uppercase, strip common suffixes like /USD, /USDT, -USD
-  let t = ticker.toUpperCase().replace(/[\/\-](USD|USDT|EUR|GBP)$/, '');
+  // Normalize: uppercase, strip common suffixes like /USD, /USDT, -USD, or just USD/USDT at the end
+  let t = ticker.toUpperCase()
+    .replace(/[\/\-](USD|USDT|EUR|GBP)$/, '')  // Handle BTC/USD, BTC-USD
+    .replace(/(USD|USDT|EUR|GBP)$/, '');        // Handle BTCUSD, BTCUSDT
 
   // Crypto tickers -> Binance USDT pairs
   const crypto = ['BTC', 'ETH', 'SOL', 'XRP', 'DOGE', 'ADA', 'AVAX', 'MATIC', 'DOT', 'LINK', 'BNB', 'ATOM', 'LTC', 'UNI', 'AAVE', 'PEPE', 'SHIB', 'ARB', 'OP', 'SUI', 'APT', 'INJ', 'FET', 'NEAR', 'FTM', 'ALGO', 'XLM', 'VET', 'HBAR', 'ICP', 'FIL', 'SAND', 'MANA', 'AXS', 'GALA', 'ENJ', 'CHZ', 'CRV', 'MKR', 'COMP', 'SNX', 'YFI', 'SUSHI', '1INCH', 'BAL', 'ZRX', 'ENS', 'LDO', 'RPL', 'GMX', 'BLUR', 'WLD', 'SEI', 'TIA', 'JUP', 'STRK', 'W', 'ENA'];
@@ -36,12 +39,18 @@ const mapInterval = (tf: string): string => {
   if (!tf) return '1D';
 
   const map: Record<string, string> = {
-    '1M': '1',
-    '5M': '5',
-    '15M': '15',
-    '30M': '30',
+    '1M': '1m',
+    '3M': '3m',
+    '5M': '5m',
+    '15M': '15m',
+    '30M': '30m',
+    '45M': '45m',
     '1H': '1h',
+    '2H': '2h',
+    '3H': '3h',
     '4H': '4h',
+    '6H': '6h',
+    '12H': '12h',
     '1D': '1D',
     'D': '1D',
     'DAILY': '1D',
@@ -74,33 +83,70 @@ export const generateChartUrl = async (trade: TradeIdea): Promise<string | null>
     return null;
   }
 
-  const isLong = trade.direction === TradeDirection.LONG;
-  const now = new Date().toISOString();
+  // Calculate price range with 25% padding to ensure all levels are clearly visible
+  const minPrice = Math.min(entry, tp, sl);
+  const maxPrice = Math.max(entry, tp, sl);
+  const range = maxPrice - minPrice;
+  const padding = range * 0.25;
+
+  // Build horizontal line drawings for Entry, Target, and Stop
+  const drawings = [
+    {
+      name: 'Horizontal Line',
+      input: { price: entry, text: 'ENTRY' },
+      override: {
+        lineColor: 'rgb(255,255,255)',  // White
+        textColor: 'rgb(255,255,255)',
+        lineWidth: 2,
+        showPrice: true,
+        horzLabelAlign: 'right'
+      }
+    },
+    {
+      name: 'Horizontal Line',
+      input: { price: tp, text: 'TARGET' },
+      override: {
+        lineColor: 'rgb(16,185,129)',   // Emerald
+        textColor: 'rgb(16,185,129)',
+        lineWidth: 2,
+        showPrice: true,
+        horzLabelAlign: 'right'
+      }
+    },
+    {
+      name: 'Horizontal Line',
+      input: { price: sl, text: 'STOP' },
+      override: {
+        lineColor: 'rgb(244,63,94)',    // Rose
+        textColor: 'rgb(244,63,94)',
+        lineWidth: 2,
+        showPrice: true,
+        horzLabelAlign: 'right'
+      }
+    }
+  ];
+
+  // Use AI-provided symbol if available, fallback to regex mapping
+  const symbol = trade.tradingViewSymbol || mapToSymbol(trade.ticker);
 
   const payload = {
     width: 800,
     height: 400,
     theme: 'dark',
-    symbol: mapToSymbol(trade.ticker),
+    symbol,
     interval: mapInterval(trade.timeframe),
-    drawings: [{
-      name: isLong ? 'Long Position' : 'Short Position',
-      input: {
-        startDatetime: now,
-        entryPrice: entry,
-        targetPrice: tp,
-        stopPrice: sl
-      },
-      override: {
-        profitBackground: 'rgb(16,185,129)',  // Emerald green
-        stopBackground: 'rgb(244,63,94)',     // Rose red
-        showPrice: true,
-        fillBackground: true
+    override: {
+      priceRange: {
+        from: minPrice - padding,
+        to: maxPrice + padding
       }
-    }]
+    },
+    drawings
   };
 
   try {
+    debugLog('chart-img-request', `Chart for ${trade.ticker}`, payload);
+
     const res = await fetch(API_BASE, {
       method: 'POST',
       headers: {
@@ -108,6 +154,12 @@ export const generateChartUrl = async (trade: TradeIdea): Promise<string | null>
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(payload)
+    });
+
+    debugLog('chart-img-response', `Chart result for ${trade.ticker}`, {
+      status: res.status,
+      ok: res.ok,
+      contentType: res.headers.get('content-type')
     });
 
     if (!res.ok) {
@@ -119,6 +171,7 @@ export const generateChartUrl = async (trade: TradeIdea): Promise<string | null>
     const blob = await res.blob();
     return URL.createObjectURL(blob);
   } catch (error) {
+    debugLog('error', `Chart failed for ${trade.ticker}`, { error: (error as Error).message });
     console.error('Failed to generate chart:', error);
     return null;
   }

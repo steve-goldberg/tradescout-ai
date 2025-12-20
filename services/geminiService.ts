@@ -1,5 +1,6 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { AnalysisResult } from "../types";
+import { debugLog } from "../utils/debugLogger";
 
 const waitForFileActive = async (ai: GoogleGenAI, fileName: string): Promise<void> => {
   console.log("Waiting for file processing...");
@@ -153,6 +154,7 @@ export const analyzeVideoForTrades = async (
     try {
       // responseMimeType: "application/json" guarantees a JSON string.
       const parsedData = JSON.parse(resultText) as AnalysisResult;
+      debugLog('gemini', 'Gemini Response', parsedData);
       return parsedData;
     } catch (parseError) {
       console.error("JSON Parse Failed:", parseError);

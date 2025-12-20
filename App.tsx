@@ -7,8 +7,10 @@ import { ApiKeyModal } from './components/ApiKeyModal';
 import { AnalysisLogStream } from './components/AnalysisLogStream';
 import { analyzeVideoForTrades } from './services/geminiService';
 import { generateChartsForTrades } from './services/chartImgService';
+import { enrichTradesWithSymbols } from './services/chartSymbolService';
 import { fetchVideoMetadata } from './services/supadataService';
 import { getApiKey, setApiKey, hasApiKey, getAnalysisCount, incrementAnalysisCount } from './utils/apiKeyStorage';
+import { exportLogs } from './utils/debugLogger';
 import { AnalysisResult, VideoMetadata } from './types';
 import { Cpu, Activity, ShieldAlert, Radio } from 'lucide-react';
 
@@ -29,8 +31,11 @@ const App: React.FC = () => {
     try {
       const data = await analyzeVideoForTrades(input, apiKey);
 
-      // Enrich trades with chart images (parallel fetch)
-      const tradesWithCharts = await generateChartsForTrades(data.trades);
+      // Enrich trades with TradingView symbols using Gemini Flash
+      const tradesWithSymbols = await enrichTradesWithSymbols(data.trades, apiKey);
+
+      // Generate chart images (parallel fetch)
+      const tradesWithCharts = await generateChartsForTrades(tradesWithSymbols);
 
       setResult({
         ...data,
@@ -41,6 +46,7 @@ const App: React.FC = () => {
       setError(err.message || "ANALYSIS_FAILED: CHECK_CONNECTION_AND_KEY");
     } finally {
       setIsLoading(false);
+      exportLogs();
     }
   };
 
