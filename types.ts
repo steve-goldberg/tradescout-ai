@@ -45,3 +45,29 @@ export interface AnalysisState {
   error: string | null;
   data: AnalysisResult | null;
 }
+
+export interface VideoMetadata {
+  platform: 'youtube' | 'tiktok' | 'instagram' | 'twitter' | 'facebook';
+  type: 'video' | 'image' | 'carousel' | 'post';
+  id: string;
+  url: string;
+  title: string | null;
+  description: string | null;
+  author: {
+    displayName: string;
+    avatarUrl?: string;
+  };
+  stats: {
+    views: number | null;
+    likes: number | null;
+    comments: number | null;
+    shares: number | null;
+  };
+  media: {
+    type: string;
+    duration: number;
+    thumbnailUrl: string;
+  };
+  tags: string[];
+  createdAt: string;
+}

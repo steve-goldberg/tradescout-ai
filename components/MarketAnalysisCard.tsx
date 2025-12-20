@@ -1,6 +1,6 @@
 import React from 'react';
 import { MarketAnalysis } from '../types';
-import { TrendingUp, TrendingDown, Minus, Globe, AlertOctagon, CalendarClock, BarChart3, Radio, Telescope, ShieldAlert } from 'lucide-react';
+import { TrendingUp, TrendingDown, Minus, Globe, AlertOctagon, BarChart3, Radio, Telescope, ShieldAlert } from 'lucide-react';
 
 interface MarketAnalysisCardProps {
   data: MarketAnalysis;
@@ -35,35 +35,7 @@ export const MarketAnalysisCard: React.FC<MarketAnalysisCardProps> = ({ data }) 
 
   return (
     <div className="space-y-6">
-      
-      {/* 1. Cycle Timing Card (New Separate Card) */}
-      <div className="bg-[#0b1121] border border-purple-500/30 relative overflow-hidden group shadow-[0_0_20px_rgba(168,85,247,0.05)]">
-         <div className="absolute inset-0 bg-purple-500/5 opacity-50 pointer-events-none"></div>
-         {/* Decorative stripe */}
-         <div className="absolute left-0 top-0 bottom-0 w-1 bg-purple-500"></div>
-         
-         <div className="p-6 flex flex-col md:flex-row items-start md:items-center gap-6 relative z-10">
-            <div className="flex items-center gap-4 shrink-0 min-w-[200px]">
-               <div className="p-3 bg-purple-500/10 border border-purple-500/20">
-                 <CalendarClock size={24} className="text-purple-400" />
-               </div>
-               <div>
-                  <h3 className="text-xs font-bold text-purple-400 uppercase tracking-widest mb-1">Market Cycle</h3>
-                  <p className="text-[10px] text-purple-300/60 font-mono uppercase tracking-wider">Temporal Phase</p>
-               </div>
-            </div>
-            
-            <div className="h-10 w-px bg-purple-500/20 hidden md:block"></div>
-            
-            <div className="flex-1">
-               <p className="text-xl text-white font-mono leading-tight tracking-tight">
-                 {data.cycleTiming}
-               </p>
-            </div>
-         </div>
-      </div>
-
-      {/* 2. Global Macro Context Card (2x2 Layout) */}
+      {/* Global Macro Context Card (2x2 Layout) */}
       <div className="bg-[#080c17] border border-slate-800 relative overflow-hidden shadow-2xl">
         {/* Background Grid Pattern */}
         <div className="absolute inset-0 bg-[linear-gradient(rgba(15,23,42,0.3)_1px,transparent_1px),linear-gradient(90deg,rgba(15,23,42,0.3)_1px,transparent_1px)] bg-[size:20px_20px] opacity-20 pointer-events-none"></div>

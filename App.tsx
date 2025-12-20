@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import { VideoUpload } from './components/VideoUpload';
 import { TradeCard } from './components/TradeCard';
 import { MarketAnalysisCard } from './components/MarketAnalysisCard';
+import { VideoMetadataCard } from './components/VideoMetadataCard';
 import { ApiKeyModal } from './components/ApiKeyModal';
 import { AnalysisLogStream } from './components/AnalysisLogStream';
 import { analyzeVideoForTrades } from './services/geminiService';
 import { generateChartsForTrades } from './services/chartImgService';
+import { fetchVideoMetadata } from './services/supadataService';
 import { getApiKey, setApiKey, hasApiKey, getAnalysisCount, incrementAnalysisCount } from './utils/apiKeyStorage';
-import { AnalysisResult } from './types';
+import { AnalysisResult, VideoMetadata } from './types';
 import { Cpu, Activity, ShieldAlert, Radio } from 'lucide-react';
 
 const App: React.FC = () => {
@@ -17,6 +19,7 @@ const App: React.FC = () => {
   const [showApiKeyModal, setShowApiKeyModal] = useState(false);
   const [pendingInput, setPendingInput] = useState<string | File | null>(null);
   const [analysisCount, setAnalysisCount] = useState(() => getAnalysisCount());
+  const [videoMetadata, setVideoMetadata] = useState<VideoMetadata | null>(null);
 
   const runAnalysis = async (input: string | File, apiKey: string) => {
     setResult(null);
@@ -42,6 +45,20 @@ const App: React.FC = () => {
   };
 
   const handleInputSelected = async (input: string | File) => {
+    // Reset states for new analysis
+    setVideoMetadata(null);
+    setResult(null);
+    setError(null);
+
+    // If it's a URL, fetch metadata immediately (non-blocking)
+    if (typeof input === 'string') {
+      fetchVideoMetadata(input).then(metadata => {
+        if (metadata) {
+          setVideoMetadata(metadata);
+        }
+      });
+    }
+
     if (hasApiKey()) {
       const apiKey = getApiKey()!;
       await runAnalysis(input, apiKey);
@@ -164,6 +181,13 @@ const App: React.FC = () => {
                    <span className="w-2 h-2 bg-slate-800 animate-pulse delay-75"></span>
                    <span className="w-2 h-2 bg-slate-800 animate-pulse delay-150"></span>
                 </div>
+              </div>
+            )}
+
+            {/* Video Metadata Card - Shows immediately on URL submit */}
+            {videoMetadata && (
+              <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 mb-8">
+                <VideoMetadataCard metadata={videoMetadata} />
               </div>
             )}
 
