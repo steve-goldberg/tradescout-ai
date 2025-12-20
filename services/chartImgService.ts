@@ -1,5 +1,5 @@
 import { TradeIdea } from '../types';
-import { debugLog } from '../utils/debugLogger';
+import { debugLog, storeChartImage } from '../utils/debugLogger';
 
 // Use Vite proxy to avoid CORS issues
 const API_BASE = '/api/chart-img/v2/tradingview/advanced-chart';
@@ -169,6 +169,7 @@ export const generateChartUrl = async (trade: TradeIdea): Promise<string | null>
 
     // v2 API returns image blob directly
     const blob = await res.blob();
+    storeChartImage(trade.ticker, blob);
     return URL.createObjectURL(blob);
   } catch (error) {
     debugLog('error', `Chart failed for ${trade.ticker}`, { error: (error as Error).message });

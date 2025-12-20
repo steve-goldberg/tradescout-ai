@@ -25,3 +25,6 @@ npm-debug.log*
 
 # Project specific
 *.zip
+img-logs/
+scripts/
+utils/debugLogger.ts
