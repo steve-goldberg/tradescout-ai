@@ -1,0 +1,831 @@
+{
+  "project": "TradeScout AI",
+  "version": "1.0.0",
+  "lastUpdated": "2025-01-19",
+  "techStack": {
+    "frontend": ["React 19", "Vite", "Tailwind CSS", "lucide-react"],
+    "backend": ["Node.js", "Drizzle ORM", "Postgres"],
+    "ai": ["Google Gemini", "Claude Haiku", "GPT-4.1 Mini"],
+    "integrations": ["Supadata", "Cloudflare R2", "Nano Banana", "PGVector"]
+  },
+  "features": [
+    {
+      "id": "INT-001",
+      "name": "Supadata YouTube Integration",
+      "category": "Integrations",
+      "priority": "high",
+      "status": "planned",
+      "passes": false,
+      "summary": "Fetch YouTube video metadata and transcripts via Supadata API for enhanced AI analysis",
+      "userStory": "As a user, I want to paste a YouTube URL and have the system automatically fetch the video title, channel, thumbnail, and full transcript so that the AI has complete context for analysis",
+      "components": {
+        "backend": [
+          "Supadata API client service",
+          "YouTube metadata fetcher",
+          "Transcript extraction endpoint",
+          "Parallel processing orchestrator"
+        ],
+        "frontend": [
+          "Enhanced VideoUpload component with metadata display",
+          "Thumbnail preview component",
+          "Channel info display"
+        ],
+        "integrations": ["Supadata API"]
+      },
+      "tasks": [
+        {
+          "id": "INT-001-1",
+          "title": "Create Supadata API client",
+          "description": "Build service to fetch video metadata and transcripts from Supadata",
+          "estimate": "4h",
+          "status": "todo"
+        },
+        {
+          "id": "INT-001-2",
+          "title": "Add transcript to Gemini context",
+          "description": "Modify geminiService to accept and use transcript as additional context",
+          "estimate": "2h",
+          "status": "todo"
+        },
+        {
+          "id": "INT-001-3",
+          "title": "Parallel fast-model log stream",
+          "description": "Send transcript to Claude Haiku/GPT-4.1 Mini in parallel to generate custom log messages based on video content",
+          "estimate": "4h",
+          "status": "todo"
+        },
+        {
+          "id": "INT-001-4",
+          "title": "Video preview card component",
+          "description": "Create component showing thumbnail, title, channel before analysis starts",
+          "estimate": "3h",
+          "status": "todo"
+        }
+      ],
+      "acceptanceCriteria": [
+        "YouTube URL returns video metadata within 2 seconds",
+        "Transcript is successfully passed to Gemini as context",
+        "Custom log stream shows messages relevant to actual video content",
+        "Thumbnail and channel info display before analysis begins"
+      ],
+      "dependencies": [],
+      "blocks": ["AI-001", "UI-003"]
+    },
+    {
+      "id": "AI-001",
+      "name": "Multi-Output Style System",
+      "category": "AI Features",
+      "priority": "high",
+      "status": "planned",
+      "passes": false,
+      "summary": "AI-powered video classification with multiple output templates for different content types",
+      "userStory": "As a user, I want the system to automatically detect or let me select the video type so that I get analysis results formatted for that specific content style",
+      "outputStyles": [
+        {
+          "id": "TA",
+          "name": "Technical Analysis",
+          "description": "Deep chart analysis with specific price levels, support/resistance, Fibonacci levels",
+          "outputFields": ["asset", "ticker", "direction", "entryPrice", "takeProfit", "stopLoss", "timeframe", "chartPatterns", "indicators", "fibLevels"],
+          "icon": "TrendingUp"
+        },
+        {
+          "id": "MACRO",
+          "name": "Macro Commentary",
+          "description": "Market outlook, economic factors, no deep technical analysis",
+          "outputFields": ["sentiment", "marketOutlook", "economicFactors", "riskFactors", "cycleTiming", "sectorRotation"],
+          "icon": "Globe"
+        },
+        {
+          "id": "EDU",
+          "name": "Trading Education",
+          "description": "Learning content, strategies, concepts explained",
+          "outputFields": ["topic", "concepts", "keyTakeaways", "strategyName", "riskManagement", "examples", "difficulty"],
+          "icon": "GraduationCap"
+        },
+        {
+          "id": "INTERVIEW",
+          "name": "Trader Interviews",
+          "description": "Conversations with traders, insights, experiences",
+          "outputFields": ["guestName", "guestBackground", "keyInsights", "tradingPhilosophy", "lessonsLearned", "recommendations"],
+          "icon": "Mic"
+        }
+      ],
+      "components": {
+        "backend": [
+          "Video classifier service (fast model)",
+          "Output style router",
+          "Template-specific Gemini prompts",
+          "Schema validators for each output type"
+        ],
+        "frontend": [
+          "Output style tab selector",
+          "TechnicalAnalysisCard component",
+          "MacroCommentaryCard component",
+          "TradingEducationCard component",
+          "TraderInterviewCard component"
+        ]
+      },
+      "tasks": [
+        {
+          "id": "AI-001-1",
+          "title": "Create video classifier service",
+          "description": "Use Claude Haiku to classify video type from transcript within 2 seconds",
+          "estimate": "4h",
+          "status": "todo"
+        },
+        {
+          "id": "AI-001-2",
+          "title": "Design output schemas for each type",
+          "description": "Create TypeScript interfaces and Gemini response schemas for TA, Macro, Education, Interview",
+          "estimate": "3h",
+          "status": "todo"
+        },
+        {
+          "id": "AI-001-3",
+          "title": "Create template-specific prompts",
+          "description": "Write optimized Gemini prompts for each output style",
+          "estimate": "4h",
+          "status": "todo"
+        },
+        {
+          "id": "AI-001-4",
+          "title": "Build output style tab selector",
+          "description": "UI tabs to manually select or auto-detect video type",
+          "estimate": "3h",
+          "status": "todo"
+        },
+        {
+          "id": "AI-001-5",
+          "title": "Create TechnicalAnalysisCard",
+          "description": "Component for TA output with price levels, charts, indicators",
+          "estimate": "4h",
+          "status": "todo"
+        },
+        {
+          "id": "AI-001-6",
+          "title": "Create MacroCommentaryCard",
+          "description": "Component for macro outlook, economic factors",
+          "estimate": "3h",
+          "status": "todo"
+        },
+        {
+          "id": "AI-001-7",
+          "title": "Create TradingEducationCard",
+          "description": "Component for educational content with concepts, takeaways",
+          "estimate": "3h",
+          "status": "todo"
+        },
+        {
+          "id": "AI-001-8",
+          "title": "Create TraderInterviewCard",
+          "description": "Component for interview insights, guest info",
+          "estimate": "3h",
+          "status": "todo"
+        }
+      ],
+      "acceptanceCriteria": [
+        "Video type is correctly classified 90%+ of the time",
+        "Each output style produces correctly formatted results",
+        "User can manually override auto-classification",
+        "All four output card components render properly"
+      ],
+      "dependencies": ["INT-001"],
+      "blocks": ["DB-002", "UI-002"]
+    },
+    {
+      "id": "DB-001",
+      "name": "Database Setup & Core Schema",
+      "category": "Database",
+      "priority": "high",
+      "status": "planned",
+      "passes": false,
+      "summary": "Postgres database with Drizzle ORM for storing all analysis data",
+      "userStory": "As a developer, I want a properly structured database so that all video analyses, users, and content creators are persisted and queryable",
+      "schema": {
+        "tables": [
+          {
+            "name": "users",
+            "columns": ["id", "email", "passwordHash", "apiKey", "credits", "subscriptionTier", "createdAt", "updatedAt"]
+          },
+          {
+            "name": "content_creators",
+            "columns": ["id", "channelId", "channelName", "thumbnailUrl", "videoCount", "createdAt"]
+          },
+          {
+            "name": "videos",
+            "columns": ["id", "youtubeUrl", "title", "channelId", "thumbnailUrl", "transcript", "outputStyle", "createdAt"]
+          },
+          {
+            "name": "analyses",
+            "columns": ["id", "videoId", "userId", "outputStyle", "resultJson", "inputTokens", "outputTokens", "costUsd", "createdAt"]
+          }
+        ]
+      },
+      "components": {
+        "backend": [
+          "Drizzle ORM setup",
+          "Database connection pool",
+          "Migration scripts",
+          "Schema definitions"
+        ]
+      },
+      "tasks": [
+        {
+          "id": "DB-001-1",
+          "title": "Setup Postgres and Drizzle",
+          "description": "Install dependencies, configure connection, setup drizzle.config.ts",
+          "estimate": "2h",
+          "status": "todo"
+        },
+        {
+          "id": "DB-001-2",
+          "title": "Create core schema",
+          "description": "Define users, content_creators, videos, analyses tables",
+          "estimate": "3h",
+          "status": "todo"
+        },
+        {
+          "id": "DB-001-3",
+          "title": "Create migration scripts",
+          "description": "Generate and test initial migrations",
+          "estimate": "1h",
+          "status": "todo"
+        },
+        {
+          "id": "DB-001-4",
+          "title": "Add database service layer",
+          "description": "Create CRUD operations for all tables",
+          "estimate": "4h",
+          "status": "todo"
+        }
+      ],
+      "acceptanceCriteria": [
+        "Database connects successfully",
+        "All tables created with proper relationships",
+        "CRUD operations work for all entities",
+        "Migrations can be run and rolled back"
+      ],
+      "dependencies": [],
+      "blocks": ["DB-002", "AUTH-001", "DB-003"]
+    },
+    {
+      "id": "DB-002",
+      "name": "Output Style Specific Tables",
+      "category": "Database",
+      "priority": "medium",
+      "status": "planned",
+      "passes": false,
+      "summary": "Dedicated tables for each output style with appropriate columns",
+      "userStory": "As a user, I want my analysis results stored in optimized tables so that I can efficiently query and filter data specific to each content type",
+      "schema": {
+        "tables": [
+          {
+            "name": "technical_analyses",
+            "columns": ["id", "analysisId", "asset", "ticker", "direction", "entryPrice", "takeProfit", "stopLoss", "timeframe", "chartPatterns", "indicators"]
+          },
+          {
+            "name": "macro_commentaries",
+            "columns": ["id", "analysisId", "sentiment", "marketOutlook", "economicFactors", "riskFactors", "cycleTiming"]
+          },
+          {
+            "name": "trading_education",
+            "columns": ["id", "analysisId", "topic", "concepts", "keyTakeaways", "strategyName", "difficulty"]
+          },
+          {
+            "name": "trader_interviews",
+            "columns": ["id", "analysisId", "guestName", "guestBackground", "keyInsights", "tradingPhilosophy"]
+          }
+        ]
+      },
+      "tasks": [
+        {
+          "id": "DB-002-1",
+          "title": "Create technical_analyses table",
+          "description": "Schema for TA-specific data with trade setups",
+          "estimate": "1h",
+          "status": "todo"
+        },
+        {
+          "id": "DB-002-2",
+          "title": "Create macro_commentaries table",
+          "description": "Schema for macro outlook data",
+          "estimate": "1h",
+          "status": "todo"
+        },
+        {
+          "id": "DB-002-3",
+          "title": "Create trading_education table",
+          "description": "Schema for educational content",
+          "estimate": "1h",
+          "status": "todo"
+        },
+        {
+          "id": "DB-002-4",
+          "title": "Create trader_interviews table",
+          "description": "Schema for interview insights",
+          "estimate": "1h",
+          "status": "todo"
+        }
+      ],
+      "acceptanceCriteria": [
+        "Each output style has dedicated table",
+        "Foreign key relationships to analyses table",
+        "Indexes on commonly queried columns"
+      ],
+      "dependencies": ["DB-001", "AI-001"],
+      "blocks": ["UI-002"]
+    },
+    {
+      "id": "UI-001",
+      "name": "Enhanced Video Preview Card",
+      "category": "Frontend",
+      "priority": "high",
+      "status": "planned",
+      "passes": false,
+      "summary": "Rich preview card showing video metadata and SSE-streamed summary before full analysis",
+      "userStory": "As a user, I want to immediately see the video thumbnail, title, and channel info with a quick summary while the full analysis runs",
+      "components": {
+        "frontend": [
+          "VideoPreviewCard component",
+          "SSE summary stream handler",
+          "Thumbnail display with fallback",
+          "Channel info badge"
+        ]
+      },
+      "tasks": [
+        {
+          "id": "UI-001-1",
+          "title": "Create VideoPreviewCard component",
+          "description": "Card showing thumbnail, title, channel, duration before analysis",
+          "estimate": "3h",
+          "status": "todo"
+        },
+        {
+          "id": "UI-001-2",
+          "title": "Implement SSE summary stream",
+          "description": "Stream quick summary from fast model while main analysis runs",
+          "estimate": "4h",
+          "status": "todo"
+        },
+        {
+          "id": "UI-001-3",
+          "title": "Custom content-based log stream",
+          "description": "Replace generic log messages with ones derived from actual transcript",
+          "estimate": "3h",
+          "status": "todo"
+        }
+      ],
+      "acceptanceCriteria": [
+        "Video metadata displays within 1 second of URL submission",
+        "Summary starts streaming within 3 seconds",
+        "Log messages reflect actual video content"
+      ],
+      "dependencies": ["INT-001"],
+      "blocks": []
+    },
+    {
+      "id": "AUTH-001",
+      "name": "User Authentication System",
+      "category": "Authentication",
+      "priority": "high",
+      "status": "planned",
+      "passes": false,
+      "summary": "Sign up, login, and API key management with optional subscription credits",
+      "userStory": "As a user, I want to create an account so that I can save my API key, track my analyses, and optionally pay for credits instead of using my own key",
+      "components": {
+        "backend": [
+          "Auth service (JWT/session)",
+          "User registration endpoint",
+          "Login endpoint",
+          "API key encryption/storage",
+          "Credits management"
+        ],
+        "frontend": [
+          "SignUpPage component",
+          "LoginPage component",
+          "ProfilePage with API key management",
+          "Credits display widget"
+        ]
+      },
+      "tasks": [
+        {
+          "id": "AUTH-001-1",
+          "title": "Setup authentication service",
+          "description": "JWT or session-based auth with secure password hashing",
+          "estimate": "4h",
+          "status": "todo"
+        },
+        {
+          "id": "AUTH-001-2",
+          "title": "Create SignUpPage",
+          "description": "Registration form with email, password, optional API key",
+          "estimate": "3h",
+          "status": "todo"
+        },
+        {
+          "id": "AUTH-001-3",
+          "title": "Create LoginPage",
+          "description": "Login form with remember me, forgot password",
+          "estimate": "2h",
+          "status": "todo"
+        },
+        {
+          "id": "AUTH-001-4",
+          "title": "API key management",
+          "description": "Securely store and retrieve user API keys",
+          "estimate": "2h",
+          "status": "todo"
+        },
+        {
+          "id": "AUTH-001-5",
+          "title": "Credits system",
+          "description": "Track credits, deduct per analysis, display balance",
+          "estimate": "3h",
+          "status": "todo"
+        }
+      ],
+      "acceptanceCriteria": [
+        "Users can register and login",
+        "API keys are encrypted at rest",
+        "Credits are deducted per analysis",
+        "Users without API key can use credits"
+      ],
+      "dependencies": ["DB-001"],
+      "blocks": ["UI-002", "BILLING-001"]
+    },
+    {
+      "id": "BILLING-001",
+      "name": "Token Tracking & Cost Analysis",
+      "category": "Billing",
+      "priority": "medium",
+      "status": "planned",
+      "passes": false,
+      "summary": "Track input/output tokens per analysis to calculate costs and inform pricing",
+      "userStory": "As the product owner, I want to track the token usage and cost per analysis so that I can set appropriate pricing for subscription tiers",
+      "components": {
+        "backend": [
+          "Token counter middleware",
+          "Cost calculator service",
+          "Usage analytics endpoint"
+        ],
+        "frontend": [
+          "Admin cost dashboard",
+          "User usage display"
+        ]
+      },
+      "tasks": [
+        {
+          "id": "BILLING-001-1",
+          "title": "Implement token tracking",
+          "description": "Capture input/output tokens from Gemini API responses",
+          "estimate": "2h",
+          "status": "todo"
+        },
+        {
+          "id": "BILLING-001-2",
+          "title": "Cost calculator",
+          "description": "Calculate USD cost based on model pricing",
+          "estimate": "2h",
+          "status": "todo"
+        },
+        {
+          "id": "BILLING-001-3",
+          "title": "Usage analytics dashboard",
+          "description": "Admin view of costs, tokens, average per video",
+          "estimate": "4h",
+          "status": "todo"
+        }
+      ],
+      "acceptanceCriteria": [
+        "Every analysis logs token counts",
+        "Cost is calculated and stored",
+        "Admin can view aggregate statistics"
+      ],
+      "dependencies": ["AUTH-001", "DB-001"],
+      "blocks": []
+    },
+    {
+      "id": "INT-002",
+      "name": "File Upload with Cloudflare R2",
+      "category": "Integrations",
+      "priority": "medium",
+      "status": "planned",
+      "passes": false,
+      "summary": "Enable MP4 video file uploads stored in Cloudflare R2 for Gemini analysis",
+      "userStory": "As a user, I want to upload local video files so that I can analyze content not available on YouTube",
+      "components": {
+        "backend": [
+          "Cloudflare R2 client",
+          "File upload endpoint",
+          "Video processing queue"
+        ],
+        "frontend": [
+          "Enable File Uplink tab",
+          "Drag-and-drop upload zone",
+          "Upload progress indicator"
+        ]
+      },
+      "tasks": [
+        {
+          "id": "INT-002-1",
+          "title": "Setup Cloudflare R2",
+          "description": "Configure R2 bucket and SDK client",
+          "estimate": "2h",
+          "status": "todo"
+        },
+        {
+          "id": "INT-002-2",
+          "title": "Create file upload endpoint",
+          "description": "Handle multipart uploads to R2",
+          "estimate": "3h",
+          "status": "todo"
+        },
+        {
+          "id": "INT-002-3",
+          "title": "Enable File Uplink tab",
+          "description": "Activate disabled tab in VideoUpload component",
+          "estimate": "2h",
+          "status": "todo"
+        },
+        {
+          "id": "INT-002-4",
+          "title": "Process uploaded videos",
+          "description": "Send R2 URL to Gemini for analysis",
+          "estimate": "3h",
+          "status": "todo"
+        }
+      ],
+      "acceptanceCriteria": [
+        "Files up to 500MB can be uploaded",
+        "Upload progress is displayed",
+        "Uploaded videos can be analyzed by Gemini"
+      ],
+      "dependencies": ["DB-001"],
+      "blocks": []
+    },
+    {
+      "id": "UI-002",
+      "name": "Members Dashboard",
+      "category": "Frontend",
+      "priority": "medium",
+      "status": "planned",
+      "passes": false,
+      "summary": "Tab-based dashboard to view and filter analysis history by output style",
+      "userStory": "As a logged-in user, I want a dashboard where I can browse my past analyses, filtered by content type, with relevant columns for each type",
+      "components": {
+        "frontend": [
+          "DashboardPage component",
+          "Tab navigation (TA, Macro, Education, Interviews)",
+          "Dynamic DataTable component",
+          "Filter and sort controls"
+        ]
+      },
+      "tasks": [
+        {
+          "id": "UI-002-1",
+          "title": "Create DashboardPage",
+          "description": "Main dashboard layout with tab navigation",
+          "estimate": "3h",
+          "status": "todo"
+        },
+        {
+          "id": "UI-002-2",
+          "title": "Build dynamic DataTable",
+          "description": "Table that changes columns based on selected output style tab",
+          "estimate": "5h",
+          "status": "todo"
+        },
+        {
+          "id": "UI-002-3",
+          "title": "Add filter controls",
+          "description": "Date range, creator, sentiment filters",
+          "estimate": "3h",
+          "status": "todo"
+        },
+        {
+          "id": "UI-002-4",
+          "title": "Add sort controls",
+          "description": "Sort by date, creator, asset, etc.",
+          "estimate": "2h",
+          "status": "todo"
+        }
+      ],
+      "acceptanceCriteria": [
+        "Each tab shows appropriate columns",
+        "Filters work correctly",
+        "Table is paginated for large datasets"
+      ],
+      "dependencies": ["AUTH-001", "DB-002", "AI-001"],
+      "blocks": ["AI-002"]
+    },
+    {
+      "id": "DB-003",
+      "name": "Vector Search with PGVector",
+      "category": "Database",
+      "priority": "low",
+      "status": "planned",
+      "passes": false,
+      "summary": "Add PGVector extension for semantic search across all analyses",
+      "userStory": "As a user, I want to search my analyses semantically so that I can find relevant content by meaning, not just keywords",
+      "components": {
+        "backend": [
+          "PGVector extension setup",
+          "Gemini embedding service",
+          "Vector search endpoint"
+        ]
+      },
+      "tasks": [
+        {
+          "id": "DB-003-1",
+          "title": "Setup PGVector",
+          "description": "Enable extension, add embedding columns",
+          "estimate": "2h",
+          "status": "todo"
+        },
+        {
+          "id": "DB-003-2",
+          "title": "Create embedding service",
+          "description": "Use Gemini Embed to vectorize analysis results",
+          "estimate": "3h",
+          "status": "todo"
+        },
+        {
+          "id": "DB-003-3",
+          "title": "Build vector search endpoint",
+          "description": "API to search by semantic similarity",
+          "estimate": "3h",
+          "status": "todo"
+        }
+      ],
+      "acceptanceCriteria": [
+        "All analyses are embedded on creation",
+        "Semantic search returns relevant results",
+        "Search is performant (<500ms)"
+      ],
+      "dependencies": ["DB-001"],
+      "blocks": ["AI-002"]
+    },
+    {
+      "id": "AI-002",
+      "name": "Chat with Analysis History",
+      "category": "AI Features",
+      "priority": "low",
+      "status": "planned",
+      "passes": false,
+      "summary": "Chat interface to query analysis history using RAG with PGVector",
+      "userStory": "As a user, I want to ask questions about my past analyses so that I can quickly find insights without manually browsing",
+      "components": {
+        "frontend": [
+          "ChatPanel component",
+          "Message history display",
+          "Context selector (per output style)",
+          "Notes/export functionality"
+        ],
+        "backend": [
+          "RAG chat service",
+          "Context retrieval from PGVector",
+          "Chat history storage"
+        ]
+      },
+      "tasks": [
+        {
+          "id": "AI-002-1",
+          "title": "Build ChatPanel component",
+          "description": "Chat UI with message input and history",
+          "estimate": "4h",
+          "status": "todo"
+        },
+        {
+          "id": "AI-002-2",
+          "title": "Create RAG chat service",
+          "description": "Retrieve relevant context and generate responses",
+          "estimate": "5h",
+          "status": "todo"
+        },
+        {
+          "id": "AI-002-3",
+          "title": "Add context selector",
+          "description": "Choose which output style to query",
+          "estimate": "2h",
+          "status": "todo"
+        },
+        {
+          "id": "AI-002-4",
+          "title": "Notes and export",
+          "description": "Save chat responses as notes, export as markdown",
+          "estimate": "3h",
+          "status": "todo"
+        }
+      ],
+      "acceptanceCriteria": [
+        "Chat retrieves relevant past analyses",
+        "Responses are accurate and contextual",
+        "Notes can be saved and exported"
+      ],
+      "dependencies": ["DB-003", "UI-002"],
+      "blocks": []
+    },
+    {
+      "id": "INT-003",
+      "name": "Visual Summary Cards via Nano Banana",
+      "category": "Integrations",
+      "priority": "low",
+      "status": "planned",
+      "passes": false,
+      "summary": "Generate visual summary card images for each analysis using Nano Banana",
+      "userStory": "As a user, I want each analysis to have a visual summary card so that I can quickly identify and share analyses",
+      "components": {
+        "backend": [
+          "Nano Banana API client",
+          "Card template definitions",
+          "Image storage (R2)"
+        ],
+        "frontend": [
+          "SummaryCardThumbnail component",
+          "Card in dashboard table"
+        ]
+      },
+      "tasks": [
+        {
+          "id": "INT-003-1",
+          "title": "Setup Nano Banana client",
+          "description": "Configure API client for image generation",
+          "estimate": "2h",
+          "status": "todo"
+        },
+        {
+          "id": "INT-003-2",
+          "title": "Design card templates",
+          "description": "Create templates for each output style",
+          "estimate": "4h",
+          "status": "todo"
+        },
+        {
+          "id": "INT-003-3",
+          "title": "Generate and store cards",
+          "description": "Trigger card generation after analysis, store in R2",
+          "estimate": "3h",
+          "status": "todo"
+        },
+        {
+          "id": "INT-003-4",
+          "title": "Display in dashboard",
+          "description": "Show card thumbnails in analysis table",
+          "estimate": "2h",
+          "status": "todo"
+        }
+      ],
+      "acceptanceCriteria": [
+        "Each analysis generates a visual card",
+        "Cards are stored and retrievable",
+        "Cards display in dashboard table"
+      ],
+      "dependencies": ["UI-002", "INT-002"],
+      "blocks": []
+    }
+  ],
+  "milestones": [
+    {
+      "id": "M1",
+      "name": "Core Infrastructure",
+      "targetDate": "2025-02-01",
+      "features": ["DB-001", "AUTH-001"],
+      "description": "Database and authentication foundation"
+    },
+    {
+      "id": "M2",
+      "name": "Enhanced Analysis Pipeline",
+      "targetDate": "2025-02-15",
+      "features": ["INT-001", "AI-001", "DB-002"],
+      "description": "Supadata integration and multi-output styles"
+    },
+    {
+      "id": "M3",
+      "name": "User Experience",
+      "targetDate": "2025-03-01",
+      "features": ["UI-001", "UI-002", "INT-002"],
+      "description": "Dashboard, file uploads, enhanced previews"
+    },
+    {
+      "id": "M4",
+      "name": "Advanced Features",
+      "targetDate": "2025-03-15",
+      "features": ["DB-003", "AI-002", "INT-003", "BILLING-001"],
+      "description": "Vector search, chat, visual cards, billing"
+    }
+  ],
+  "implementationOrder": [
+    "DB-001",
+    "AUTH-001",
+    "INT-001",
+    "AI-001",
+    "DB-002",
+    "UI-001",
+    "BILLING-001",
+    "INT-002",
+    "UI-002",
+    "DB-003",
+    "AI-002",
+    "INT-003"
+  ]
+}
