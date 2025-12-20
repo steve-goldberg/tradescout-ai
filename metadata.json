@@ -1,0 +1,5 @@
+{
+  "name": "TradeScout AI",
+  "description": "Analyze market analyst videos to extract structured trade ideas, entry points, and risk parameters using Gemini 1.5 Pro.",
+  "requestFramePermissions": []
+}
