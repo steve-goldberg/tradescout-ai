@@ -3,8 +3,9 @@ import { VideoUpload } from './components/VideoUpload';
 import { TradeCard } from './components/TradeCard';
 import { MarketAnalysisCard } from './components/MarketAnalysisCard';
 import { ApiKeyModal } from './components/ApiKeyModal';
+import { AnalysisLogStream } from './components/AnalysisLogStream';
 import { analyzeVideoForTrades } from './services/geminiService';
-import { getApiKey, setApiKey, hasApiKey } from './utils/apiKeyStorage';
+import { getApiKey, setApiKey, hasApiKey, getAnalysisCount, incrementAnalysisCount } from './utils/apiKeyStorage';
 import { AnalysisResult } from './types';
 import { Cpu, Activity, ShieldAlert, Radio } from 'lucide-react';
 
@@ -14,6 +15,7 @@ const App: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [showApiKeyModal, setShowApiKeyModal] = useState(false);
   const [pendingInput, setPendingInput] = useState<string | File | null>(null);
+  const [analysisCount, setAnalysisCount] = useState(() => getAnalysisCount());
 
   const runAnalysis = async (input: string | File, apiKey: string) => {
     setResult(null);
@@ -23,6 +25,7 @@ const App: React.FC = () => {
     try {
       const data = await analyzeVideoForTrades(input, apiKey);
       setResult(data);
+      setAnalysisCount(incrementAnalysisCount());
     } catch (err: any) {
       setError(err.message || "ANALYSIS_FAILED: CHECK_CONNECTION_AND_KEY");
     } finally {
@@ -56,7 +59,13 @@ const App: React.FC = () => {
       {/* Top Protocol Bar */}
       <div className="border-b border-slate-800 bg-[#020617] text-[10px] font-mono uppercase tracking-[0.2em] text-slate-500 py-1 px-4 flex justify-between items-center">
         <span>Secure Connection // Encrypted</span>
-        <span>Gemini_3_Pro_Preview // Build v2.5.0</span>
+        <span className="flex items-center gap-3">
+          <span className={hasApiKey() ? 'text-emerald-500' : 'text-slate-600'}>
+            {hasApiKey() ? '● API_Key_Active' : '○ No_API_Key'}
+          </span>
+          <span className="text-slate-600">//</span>
+          <span>Videos_Analyzed: {analysisCount}</span>
+        </span>
       </div>
 
       {/* Header */}
@@ -86,21 +95,21 @@ const App: React.FC = () => {
       </header>
 
       <main className="flex-1 max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full">
-        
-        <div className="grid grid-cols-1 xl:grid-cols-12 gap-10 items-start">
-          
-          {/* Left Column: Command Center */}
-          <div className="xl:col-span-4 space-y-8 sticky top-32">
-            
-            <div className="space-y-2 mb-8">
-               <h2 className="text-4xl font-mono font-bold text-white tracking-tighter uppercase leading-none">
-                 Market<br/><span className="text-slate-600">Intelligence</span>
-               </h2>
-               <p className="text-slate-400 font-mono text-sm border-l-2 border-cyan-500 pl-3 py-1">
-                 Ingest video data. Extract alpha. Execute.
-               </p>
-            </div>
 
+        <div className="flex flex-col items-center gap-10">
+
+          {/* Header Section - Centered */}
+          <div className="text-center space-y-4 max-w-2xl">
+            <h2 className="text-4xl font-mono font-bold text-white tracking-tighter uppercase leading-none">
+              Market <span className="text-slate-600">Intelligence</span>
+            </h2>
+            <p className="text-slate-400 font-mono text-sm">
+              Ingest video data. Extract alpha. Execute.
+            </p>
+          </div>
+
+          {/* Signal Input - Centered */}
+          <div className="w-full max-w-2xl">
             <div className="bg-[#0b1121] border border-slate-800 p-1 shadow-2xl relative group">
               {/* Corner Accents */}
               <div className="absolute -top-1 -left-1 w-3 h-3 border-t-2 border-l-2 border-cyan-500"></div>
@@ -117,9 +126,9 @@ const App: React.FC = () => {
                      <div className="w-1 h-1 bg-slate-600"></div>
                    </div>
                 </div>
-                
+
                 <VideoUpload onInputSelected={handleInputSelected} isLoading={isLoading} />
-                
+
                 {error && (
                   <div className="mt-4 p-4 bg-red-950/30 border border-red-500/30 text-red-400 text-xs font-mono">
                     <span className="font-bold block mb-1">{'>>'} ERROR_LOG:</span>
@@ -128,23 +137,10 @@ const App: React.FC = () => {
                 )}
               </div>
             </div>
-
-            {/* Stats / Filler for look */}
-            <div className="grid grid-cols-2 gap-4 opacity-50 pointer-events-none select-none">
-               <div className="border border-slate-800 p-4 bg-[#0b1121]">
-                  <div className="text-[10px] uppercase text-slate-500 mb-1">Sys_Load</div>
-                  <div className="text-xl font-mono text-cyan-500/50">42%</div>
-               </div>
-               <div className="border border-slate-800 p-4 bg-[#0b1121]">
-                  <div className="text-[10px] uppercase text-slate-500 mb-1">Net_Lat</div>
-                  <div className="text-xl font-mono text-cyan-500/50">12ms</div>
-               </div>
-            </div>
-
           </div>
 
-          {/* Right Column: Output Feed */}
-          <div className="xl:col-span-8">
+          {/* Output Feed - Below */}
+          <div className="w-full max-w-4xl">
             {!result && !isLoading && (
               <div className="h-[500px] flex flex-col items-center justify-center text-slate-700 border border-slate-800 border-dashed bg-[#0b1121]/30">
                 <Activity size={64} className="mb-6 opacity-20" />
@@ -157,16 +153,7 @@ const App: React.FC = () => {
               </div>
             )}
 
-            {isLoading && (
-               <div className="h-[500px] flex flex-col items-center justify-center border border-cyan-900/30 bg-cyan-950/5 relative overflow-hidden">
-                  <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9InJnYmEoNiwgMTgyLCAyMTIsIDAuMSkiLz48L3N2Zz4=')] opacity-50"></div>
-                  <Cpu size={64} className="mb-6 text-cyan-500 animate-bounce" />
-                  <p className="text-xl font-mono font-bold text-cyan-400 tracking-widest uppercase animate-pulse">Processing_Neural_Net</p>
-                  <p className="text-xs font-mono text-cyan-600 mt-2">
-                    Analyzing visual patterns & audio stream...
-                  </p>
-               </div>
-            )}
+            {isLoading && <AnalysisLogStream />}
 
             {result && result.marketAnalysis && (
               <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 mb-8">
