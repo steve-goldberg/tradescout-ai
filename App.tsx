@@ -23,16 +23,20 @@ const App: React.FC = () => {
   const [analysisCount, setAnalysisCount] = useState(() => getAnalysisCount());
   const [videoMetadata, setVideoMetadata] = useState<VideoMetadata | null>(null);
 
-  const runAnalysis = async (input: string | File, apiKey: string, metadata: VideoMetadata | null) => {
+  const runAnalysis = async (input: string | File, apiKey: string, metadataPromise: Promise<VideoMetadata | null>) => {
     setResult(null);
     setError(null);
     setIsLoading(true);
 
     try {
+      // Start Gemini analysis immediately (don't wait for metadata)
       const data = await analyzeVideoForTrades(input, apiKey);
 
       // Enrich trades with TradingView symbols using Gemini Flash
       const tradesWithSymbols = await enrichTradesWithSymbols(data.trades, apiKey);
+
+      // Now await metadata (probably already done by now)
+      const metadata = await metadataPromise;
 
       // Add video publish date for Chart-IMG vertical line (GitHub #1)
       const tradesWithMetadata = tradesWithSymbols.map(trade => ({
@@ -62,18 +66,17 @@ const App: React.FC = () => {
     setResult(null);
     setError(null);
 
-    // If it's a URL, fetch metadata first (needed for chart vertical line)
-    let metadata: VideoMetadata | null = null;
+    // Start metadata fetch in parallel (fire-and-forget for UI, pass Promise for charts)
+    let metadataPromise: Promise<VideoMetadata | null> = Promise.resolve(null);
     if (typeof input === 'string') {
-      metadata = await fetchVideoMetadata(input);
-      if (metadata) {
-        setVideoMetadata(metadata);
-      }
+      metadataPromise = fetchVideoMetadata(input);
+      // Fire-and-forget: update UI as soon as metadata arrives
+      metadataPromise.then(m => m && setVideoMetadata(m));
     }
 
     if (hasApiKey()) {
       const apiKey = getApiKey()!;
-      await runAnalysis(input, apiKey, metadata);
+      await runAnalysis(input, apiKey, metadataPromise);
     } else {
       setPendingInput(input);
       setShowApiKeyModal(true);
@@ -85,7 +88,8 @@ const App: React.FC = () => {
     setShowApiKeyModal(false);
 
     if (pendingInput) {
-      await runAnalysis(pendingInput, apiKey, videoMetadata);
+      // Metadata already fetched while modal was open, wrap in resolved Promise
+      await runAnalysis(pendingInput, apiKey, Promise.resolve(videoMetadata));
       setPendingInput(null);
     }
   };
