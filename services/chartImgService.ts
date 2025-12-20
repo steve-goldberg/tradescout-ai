@@ -63,6 +63,19 @@ const mapInterval = (tf: string): string => {
 };
 
 /**
+ * Calculates the chart range based on interval
+ * Range OVERRIDES interval for time window - we want 2 weeks to 1 month MAX
+ */
+const calculateRange = (interval: string): string => {
+  const tf = interval.toLowerCase();
+  if (tf.includes('m') && !tf.includes('mo')) return '5D';  // minutes → 5 days
+  if (tf.includes('h')) return '1M';   // hourly → 1 month
+  if (tf.includes('d')) return '1M';   // daily → 1 month
+  if (tf.includes('w')) return '3M';   // weekly → 3 months
+  return '1M';  // default
+};
+
+/**
  * Generates a TradingView chart image URL for a trade idea
  * Uses Long/Short Position drawings to visualize entry, TP, and SL levels
  */
@@ -83,14 +96,18 @@ export const generateChartUrl = async (trade: TradeIdea): Promise<string | null>
     return null;
   }
 
-  // Calculate price range with 25% padding to ensure all levels are clearly visible
+  // Calculate price range with 15% padding for tighter view
   const minPrice = Math.min(entry, tp, sl);
   const maxPrice = Math.max(entry, tp, sl);
-  const range = maxPrice - minPrice;
-  const padding = range * 0.25;
+  const priceSpan = maxPrice - minPrice;
+  const padding = priceSpan * 0.15;
 
-  // Build horizontal line drawings for Entry, Target, and Stop
-  const drawings = [
+  // Build drawings array for Entry, Target, Stop, and optional Video line
+  const drawings: Array<{
+    name: string;
+    input: Record<string, unknown>;
+    override: Record<string, unknown>;
+  }> = [
     {
       name: 'Horizontal Line',
       input: { price: entry, text: 'ENTRY' },
@@ -126,19 +143,41 @@ export const generateChartUrl = async (trade: TradeIdea): Promise<string | null>
     }
   ];
 
+  // Add vertical line for video publish date (GitHub #1)
+  if (trade.videoPublishDate) {
+    drawings.push({
+      name: 'Vertical Line',
+      input: {
+        datetime: trade.videoPublishDate,  // ISO8601 format
+        text: 'VIDEO'
+      },
+      override: {
+        lineColor: 'rgba(139,92,246,0.7)',  // Purple (no spaces!)
+        textColor: 'rgb(139,92,246)',
+        lineWidth: 2,
+        showTime: false,
+        vertLabelAlign: 'top'
+      }
+    });
+  }
+
   // Use AI-provided symbol if available, fallback to regex mapping
   const symbol = trade.tradingViewSymbol || mapToSymbol(trade.ticker);
+  const interval = mapInterval(trade.timeframe);
 
   const payload = {
-    width: 800,
-    height: 400,
+    width: 1200,
+    height: 600,
     theme: 'dark',
     symbol,
-    interval: mapInterval(trade.timeframe),
+    interval,
+    range: calculateRange(interval),  // Range OVERRIDES interval for time window
+    style: 'candle',
     override: {
       priceRange: {
         from: minPrice - padding,
-        to: maxPrice + padding
+        to: maxPrice + padding,
+        margin: 0.01
       }
     },
     drawings

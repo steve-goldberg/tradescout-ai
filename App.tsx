@@ -23,7 +23,7 @@ const App: React.FC = () => {
   const [analysisCount, setAnalysisCount] = useState(() => getAnalysisCount());
   const [videoMetadata, setVideoMetadata] = useState<VideoMetadata | null>(null);
 
-  const runAnalysis = async (input: string | File, apiKey: string) => {
+  const runAnalysis = async (input: string | File, apiKey: string, metadata: VideoMetadata | null) => {
     setResult(null);
     setError(null);
     setIsLoading(true);
@@ -34,8 +34,14 @@ const App: React.FC = () => {
       // Enrich trades with TradingView symbols using Gemini Flash
       const tradesWithSymbols = await enrichTradesWithSymbols(data.trades, apiKey);
 
+      // Add video publish date for Chart-IMG vertical line (GitHub #1)
+      const tradesWithMetadata = tradesWithSymbols.map(trade => ({
+        ...trade,
+        videoPublishDate: metadata?.createdAt ?? undefined
+      }));
+
       // Generate chart images (parallel fetch)
-      const tradesWithCharts = await generateChartsForTrades(tradesWithSymbols);
+      const tradesWithCharts = await generateChartsForTrades(tradesWithMetadata);
 
       setResult({
         ...data,
@@ -56,18 +62,18 @@ const App: React.FC = () => {
     setResult(null);
     setError(null);
 
-    // If it's a URL, fetch metadata immediately (non-blocking)
+    // If it's a URL, fetch metadata first (needed for chart vertical line)
+    let metadata: VideoMetadata | null = null;
     if (typeof input === 'string') {
-      fetchVideoMetadata(input).then(metadata => {
-        if (metadata) {
-          setVideoMetadata(metadata);
-        }
-      });
+      metadata = await fetchVideoMetadata(input);
+      if (metadata) {
+        setVideoMetadata(metadata);
+      }
     }
 
     if (hasApiKey()) {
       const apiKey = getApiKey()!;
-      await runAnalysis(input, apiKey);
+      await runAnalysis(input, apiKey, metadata);
     } else {
       setPendingInput(input);
       setShowApiKeyModal(true);
@@ -79,7 +85,7 @@ const App: React.FC = () => {
     setShowApiKeyModal(false);
 
     if (pendingInput) {
-      await runAnalysis(pendingInput, apiKey);
+      await runAnalysis(pendingInput, apiKey, videoMetadata);
       setPendingInput(null);
     }
   };

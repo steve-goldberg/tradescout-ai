@@ -24,6 +24,7 @@ export interface TradeIdea {
   riskLevel: RiskLevel;
   chartImageUrl?: string;
   tradingViewSymbol?: string; // Chart-IMG compatible symbol (e.g., "BINANCE:BTCUSDT")
+  videoPublishDate?: string;  // ISO8601 datetime for Chart-IMG vertical line
 }
 
 export interface MarketAnalysis {
