@@ -46,7 +46,7 @@ export const MarketAnalysisCard: React.FC<MarketAnalysisCardProps> = ({ data }) 
             <div className="flex items-center gap-3 mb-1">
               <Globe size={20} className="text-indigo-400" />
               <h2 className="text-xl font-mono font-bold text-white uppercase tracking-widest">
-                Global_Macro_Context
+                Global Macro Context
               </h2>
             </div>
             <p className="text-xs text-slate-500 font-mono uppercase tracking-wider pl-8">
