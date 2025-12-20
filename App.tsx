@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { VideoUpload } from './components/VideoUpload';
 import { TradeCard } from './components/TradeCard';
 import { MarketAnalysisCard } from './components/MarketAnalysisCard';
+import { ApiKeyModal } from './components/ApiKeyModal';
 import { analyzeVideoForTrades } from './services/geminiService';
+import { getApiKey, setApiKey, hasApiKey } from './utils/apiKeyStorage';
 import { AnalysisResult } from './types';
 import { Cpu, Activity, ShieldAlert, Radio } from 'lucide-react';
 
@@ -10,19 +12,41 @@ const App: React.FC = () => {
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showApiKeyModal, setShowApiKeyModal] = useState(false);
+  const [pendingInput, setPendingInput] = useState<string | File | null>(null);
 
-  const handleInputSelected = async (input: string | File) => {
+  const runAnalysis = async (input: string | File, apiKey: string) => {
     setResult(null);
     setError(null);
     setIsLoading(true);
 
     try {
-      const data = await analyzeVideoForTrades(input);
+      const data = await analyzeVideoForTrades(input, apiKey);
       setResult(data);
     } catch (err: any) {
       setError(err.message || "ANALYSIS_FAILED: CHECK_CONNECTION_AND_KEY");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleInputSelected = async (input: string | File) => {
+    if (hasApiKey()) {
+      const apiKey = getApiKey()!;
+      await runAnalysis(input, apiKey);
+    } else {
+      setPendingInput(input);
+      setShowApiKeyModal(true);
+    }
+  };
+
+  const handleApiKeySubmit = async (apiKey: string) => {
+    setApiKey(apiKey);
+    setShowApiKeyModal(false);
+
+    if (pendingInput) {
+      await runAnalysis(pendingInput, apiKey);
+      setPendingInput(null);
     }
   };
 
@@ -98,7 +122,7 @@ const App: React.FC = () => {
                 
                 {error && (
                   <div className="mt-4 p-4 bg-red-950/30 border border-red-500/30 text-red-400 text-xs font-mono">
-                    <span className="font-bold block mb-1">>> ERROR_LOG:</span>
+                    <span className="font-bold block mb-1">{'>>'} ERROR_LOG:</span>
                     {error}
                   </div>
                 )}
@@ -152,7 +176,7 @@ const App: React.FC = () => {
 
             {result && result.trades.length === 0 && !isLoading && (
               <div className="p-12 bg-[#0b1121] border border-slate-800 text-center">
-                <p className="text-slate-400 font-mono text-lg">>> NULL_RESULT: No executable setups identified.</p>
+                <p className="text-slate-400 font-mono text-lg">{'>>'} NULL_RESULT: No executable setups identified.</p>
               </div>
             )}
 
@@ -179,6 +203,16 @@ const App: React.FC = () => {
           
         </div>
       </main>
+
+      {/* API Key Modal */}
+      <ApiKeyModal
+        isOpen={showApiKeyModal}
+        onClose={() => {
+          setShowApiKeyModal(false);
+          setPendingInput(null);
+        }}
+        onSubmit={handleApiKeySubmit}
+      />
     </div>
   );
 };

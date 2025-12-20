@@ -17,12 +17,12 @@ const waitForFileActive = async (ai: GoogleGenAI, fileName: string): Promise<voi
 };
 
 export const analyzeVideoForTrades = async (
-  input: string | File
+  input: string | File,
+  apiKey: string
 ): Promise<AnalysisResult> => {
   try {
-    const apiKey = process.env.API_KEY;
     if (!apiKey) {
-      throw new Error("API Key is missing. Please set the API_KEY environment variable.");
+      throw new Error("API Key is missing. Please provide your Gemini API key.");
     }
 
     const ai = new GoogleGenAI({ apiKey });
