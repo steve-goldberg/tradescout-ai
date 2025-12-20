@@ -25,7 +25,7 @@ const LOG_MESSAGES = [
 ];
 
 // Progress stages synced with log count
-const PROGRESS_STAGES = [5, 12, 22, 35, 48, 62, 75, 88, 95];
+const PROGRESS_STAGES = [3, 7, 14, 23, 36, 51, 69, 83, 91, 97];
 
 interface LogEntry {
   id: number;
@@ -39,7 +39,9 @@ export const AnalysisLogStream: React.FC = () => {
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [progress, setProgress] = useState(0);
   const [currentLogIndex, setCurrentLogIndex] = useState(0);
+  const [elapsedTime, setElapsedTime] = useState(0);
   const logContainerRef = useRef<HTMLDivElement>(null);
+  const startTimeRef = useRef<number>(Date.now());
 
   // Generate timestamp
   const getTimestamp = () => {
@@ -76,6 +78,14 @@ export const AnalysisLogStream: React.FC = () => {
       logContainerRef.current.scrollTop = logContainerRef.current.scrollHeight;
     }
   }, [logs]);
+
+  // Rapid elapsed time counter
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setElapsedTime(Date.now() - startTimeRef.current);
+    }, 47); // Update roughly every 47ms for that rapid counter feel
+    return () => clearInterval(interval);
+  }, []);
 
   // Add initial log on mount
   useEffect(() => {
@@ -150,7 +160,7 @@ export const AnalysisLogStream: React.FC = () => {
             <div>
               <h3 className="text-sm font-mono font-bold text-cyan-400 uppercase tracking-widest flex items-center gap-2">
                 <span className="inline-block w-2 h-2 bg-cyan-400 animate-pulse" />
-                Neural_Analysis_Stream
+                Neural Analysis Stream
               </h3>
               <p className="text-[10px] font-mono text-slate-500 uppercase tracking-wider">
                 PID: {Math.floor(Math.random() * 9000) + 1000} // PRIORITY: MAXIMUM
@@ -271,7 +281,7 @@ export const AnalysisLogStream: React.FC = () => {
           <div className="flex items-center gap-4">
             <span>Logs: {logs.length}/{LOG_MESSAGES.length + 1}</span>
             <span className="text-cyan-600">|</span>
-            <span>Buffer: {(logs.length * 0.42).toFixed(2)} KB</span>
+            <span>Elapsed: <span className="text-cyan-400 tabular-nums">{(elapsedTime / 1000).toFixed(2)}s</span></span>
           </div>
           <div className="flex items-center gap-2">
             <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />

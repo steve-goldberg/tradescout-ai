@@ -27,7 +27,7 @@ export const VideoUpload: React.FC<VideoInputProps> = ({ onInputSelected, isLoad
           className="flex-1 py-2 text-xs font-mono font-bold uppercase tracking-wider border transition-all bg-cyan-950/30 text-cyan-400 border-cyan-500/50"
         >
           <span className="flex items-center justify-center gap-2">
-            <Youtube size={14} /> URL_Stream
+            <Youtube size={14} /> URL Stream
           </span>
         </button>
 
@@ -37,7 +37,7 @@ export const VideoUpload: React.FC<VideoInputProps> = ({ onInputSelected, isLoad
           className="flex-1 py-2 text-xs font-mono font-bold uppercase tracking-wider border bg-slate-900 text-slate-600 border-slate-800 opacity-50 cursor-not-allowed"
         >
           <span className="flex items-center justify-center gap-2">
-            <FileVideo size={14} /> File_Uplink
+            <FileVideo size={14} /> File Uplink
           </span>
         </button>
       </div>
@@ -55,7 +55,7 @@ export const VideoUpload: React.FC<VideoInputProps> = ({ onInputSelected, isLoad
           <div className="w-2 h-2 rounded-full bg-yellow-500/50"></div>
           <div className="w-2 h-2 rounded-full bg-green-500/50"></div>
           <div className="ml-2 text-[10px] font-mono text-slate-400 uppercase tracking-widest">
-            Input_Stream
+            Input Stream
           </div>
         </div>
 
@@ -98,10 +98,10 @@ export const VideoUpload: React.FC<VideoInputProps> = ({ onInputSelected, isLoad
       </div>
 
       <div className="mt-3 flex justify-between items-center text-[10px] font-mono text-slate-500 uppercase tracking-wider px-1">
-        <span>System: Ready</span>
+        <span>System: <span className="text-emerald-400 animate-pulse">Ready</span></span>
         <span className="flex items-center gap-1">
            <Terminal size={10} />
-           Protocol: Direct_Stream_Analysis
+           Protocol: Direct Stream Analysis
         </span>
       </div>
     </div>

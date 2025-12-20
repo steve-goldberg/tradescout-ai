@@ -57,14 +57,20 @@ const App: React.FC = () => {
     <div className="min-h-screen text-slate-200 selection:bg-cyan-500/30 selection:text-cyan-100 flex flex-col">
       
       {/* Top Protocol Bar */}
-      <div className="border-b border-slate-800 bg-[#020617] text-[10px] font-mono uppercase tracking-[0.2em] text-slate-500 py-1 px-4 flex justify-between items-center">
-        <span>Secure Connection // Encrypted</span>
+      <div className="border-b border-slate-800 bg-[#020617] text-[10px] font-mono uppercase tracking-[0.2em] text-slate-500 py-1.5 px-4 flex justify-between items-center">
+        <span className="flex items-center gap-2">
+          <span className="relative flex items-center justify-center">
+            <span className="absolute w-2 h-2 bg-emerald-400/40 rounded-full blur-sm animate-pulse" />
+            <span className="relative w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
+          </span>
+          Secure Connection // Encrypted
+        </span>
         <span className="flex items-center gap-3">
           <span className={hasApiKey() ? 'text-emerald-500' : 'text-slate-600'}>
-            {hasApiKey() ? '● API_Key_Active' : '○ No_API_Key'}
+            {hasApiKey() ? '● API Key Active' : '○ No API Key'}
           </span>
           <span className="text-slate-600">//</span>
-          <span>Videos_Analyzed: {analysisCount}</span>
+          <span>Videos Analyzed: {analysisCount}</span>
         </span>
       </div>
 
@@ -77,7 +83,7 @@ const App: React.FC = () => {
              </div>
              <div>
                <h1 className="font-bold text-2xl tracking-tighter text-white font-mono uppercase">
-                 TradeScout<span className="text-cyan-400">_Terminal</span>
+                 TradeScout <span className="text-cyan-400">Terminal</span>
                </h1>
                <div className="h-0.5 w-full bg-gradient-to-r from-cyan-500 to-transparent mt-1"></div>
              </div>
@@ -85,10 +91,10 @@ const App: React.FC = () => {
 
           <div className="flex gap-6 text-xs font-mono font-bold tracking-widest text-slate-400 uppercase hidden md:flex">
             <span className="flex items-center gap-2 hover:text-cyan-400 cursor-default transition-colors">
-              <Cpu size={14} /> AI_Core: Active
+              <Cpu size={14} /> AI Core: Active
             </span>
             <span className="flex items-center gap-2 hover:text-red-400 cursor-default transition-colors">
-              <ShieldAlert size={14} /> Risk_Engine: Online
+              <ShieldAlert size={14} /> Risk Engine: Online
             </span>
           </div>
         </div>
@@ -172,7 +178,7 @@ const App: React.FC = () => {
                 <div className="flex items-center justify-between border-b border-slate-800 pb-4">
                   <h2 className="text-xl font-bold text-white font-mono uppercase tracking-widest flex items-center gap-2">
                     <span className="w-2 h-2 bg-cyan-500"></span>
-                    Extracted_Alpha
+                    Extracted Alpha
                   </h2>
                   <span className="px-3 py-1 bg-cyan-950 border border-cyan-800 text-cyan-400 text-xs font-mono">
                     COUNT: {result.trades.length}
