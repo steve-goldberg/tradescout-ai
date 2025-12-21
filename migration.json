@@ -15,13 +15,16 @@
           "id": "1.1",
           "task": "Initialize SvelteKit project structure",
           "details": "Create src/routes/, src/lib/, src/lib/components/, src/lib/services/, src/lib/utils/",
-          "status": "pending"
+          "status": "done",
+          "commit": "97397c8"
         },
         {
           "id": "1.2",
           "task": "Configure Tailwind CSS for SvelteKit",
           "details": "Update tailwind.config.js content paths, add postcss.config.js, import in app.css",
-          "status": "pending"
+          "status": "done",
+          "commit": "97397c8",
+          "note": "Completed with 1.1"
         },
         {
           "id": "1.3",
@@ -33,14 +36,18 @@
             "SUPADATA_API_KEY": "SUPADATA_API_KEY (server-side proxy)",
             "VITE_DEBUG": "PUBLIC_DEBUG"
           },
-          "status": "pending"
+          "status": "done",
+          "commit": "97397c8",
+          "note": "Completed with 1.1"
         },
         {
           "id": "1.4",
           "task": "Update package.json dependencies",
           "add": ["@sveltejs/kit", "@sveltejs/adapter-auto", "svelte", "@google/genai", "zod", "zod-to-json-schema", "lucide-svelte"],
           "remove": ["react", "react-dom", "@types/react", "@types/react-dom", "lucide-react"],
-          "status": "pending"
+          "status": "done",
+          "commit": "97397c8",
+          "note": "Completed with 1.1"
         }
       ]
     },
@@ -56,7 +63,8 @@
           "task": "Move types.ts to $lib",
           "details": "Copy types.ts to src/lib/types.ts - no changes needed, pure TypeScript",
           "changes": "none",
-          "status": "pending"
+          "status": "done",
+          "commit": "55d8ae6"
         }
       ]
     },
@@ -76,7 +84,8 @@
             "Return null/0 defaults when SSR"
           ],
           "svelte_pattern": "SSR-safe localStorage access",
-          "status": "pending"
+          "status": "done",
+          "commit": "2597eab"
         },
         {
           "id": "3.2",
@@ -89,7 +98,9 @@
             "Wrap DOM operations with if (browser) checks"
           ],
           "svelte_pattern": "SSR-safe DOM access + env vars",
-          "status": "pending"
+          "status": "done",
+          "commit": "e051ef8",
+          "note": "Completed with 4.1"
         }
       ]
     },
@@ -108,7 +119,8 @@
             "Update import path: '../types' -> '$lib/types'",
             "Update import path: '../utils/debugLogger' -> '$lib/utils/debugLogger'"
           ],
-          "status": "pending"
+          "status": "done",
+          "commit": "e051ef8"
         },
         {
           "id": "4.2",
@@ -121,7 +133,9 @@
             "Consider moving API call to +server.ts endpoint for security"
           ],
           "security_note": "API key should be server-side only - create API route",
-          "status": "pending"
+          "status": "done",
+          "commit": "3908d59",
+          "note": "Completed with 6.1"
         },
         {
           "id": "4.3",
@@ -131,7 +145,9 @@
           "changes": [
             "Update import paths to $lib"
           ],
-          "status": "pending"
+          "status": "done",
+          "commit": "3908d59",
+          "note": "Completed with 6.1"
         },
         {
           "id": "4.4",
@@ -143,7 +159,9 @@
             "Replace process.env.SUPADATA_API_KEY - consider server endpoint"
           ],
           "security_note": "API key should be server-side only - create API route",
-          "status": "pending"
+          "status": "done",
+          "commit": "3908d59",
+          "note": "Completed with 6.1"
         },
         {
           "id": "4.5",
@@ -153,7 +171,8 @@
             "src/routes/api/metadata/+server.ts"
           ],
           "details": "Move API key usage to server endpoints to protect secrets",
-          "status": "pending"
+          "status": "deferred",
+          "note": "Using Vite proxy for now, API routes optional for enhanced security"
         }
       ]
     },
@@ -187,7 +206,8 @@
             "props": "interface Props { onInputSelected: (input: string | File) => void; isLoading: boolean }",
             "form_submit": "on:submit|preventDefault"
           },
-          "status": "pending"
+          "status": "done",
+          "commit": "f9fc6ff"
         },
         {
           "id": "5.2",
@@ -200,7 +220,9 @@
             "derived": "Use $derived() for isLong, isShort, accentColor etc"
           },
           "notes": "Stateless component - straightforward conversion",
-          "status": "pending"
+          "status": "done",
+          "commit": "3908d59",
+          "note": "Completed with 6.1"
         },
         {
           "id": "5.3",
@@ -213,7 +235,9 @@
             "derived": "$derived() for isBullish, isBearish, sentimentColor etc"
           },
           "notes": "Stateless component - straightforward conversion",
-          "status": "pending"
+          "status": "done",
+          "commit": "3908d59",
+          "note": "Completed with 6.1"
         },
         {
           "id": "5.4",
@@ -227,7 +251,9 @@
             "props": "interface Props { isOpen: boolean; onClose: () => void; onSubmit: (key: string) => void }",
             "conditional_render": "{#if isOpen}...{/if}"
           },
-          "status": "pending"
+          "status": "done",
+          "commit": "3908d59",
+          "note": "Completed with 6.1"
         },
         {
           "id": "5.5",
@@ -247,7 +273,9 @@
             "cleanup": "$effect returns cleanup function for clearTimeout/clearInterval"
           },
           "notes": "Most complex component - multiple effects with cleanup",
-          "status": "pending"
+          "status": "done",
+          "commit": "3908d59",
+          "note": "Completed with 6.1"
         },
         {
           "id": "5.6",
@@ -259,7 +287,9 @@
             "props": "interface Props { metadata: VideoMetadata }"
           },
           "notes": "Stateless component - straightforward conversion",
-          "status": "pending"
+          "status": "done",
+          "commit": "3908d59",
+          "note": "Completed with 6.1"
         }
       ]
     },
@@ -283,13 +313,16 @@
             "analysisCount": "let analysisCount = $state(getAnalysisCount())",
             "videoMetadata": "let videoMetadata = $state<VideoMetadata | null>(null)"
           },
-          "status": "pending"
+          "status": "done",
+          "commit": "3908d59"
         },
         {
           "id": "6.2",
           "task": "Convert async handlers",
           "details": "runAnalysis, handleInputSelected, handleApiKeySubmit stay as async functions",
-          "status": "pending"
+          "status": "done",
+          "commit": "3908d59",
+          "note": "Completed with 6.1"
         },
         {
           "id": "6.3",
@@ -301,14 +334,18 @@
             "Import Lucide icons from lucide-svelte",
             "Update component imports to .svelte"
           ],
-          "status": "pending"
+          "status": "done",
+          "commit": "3908d59",
+          "note": "Completed with 6.1"
         },
         {
           "id": "6.4",
           "task": "Create +layout.svelte",
           "target": "src/routes/+layout.svelte",
           "details": "Add global styles, fonts, and app shell",
-          "status": "pending"
+          "status": "done",
+          "commit": "97397c8",
+          "note": "Completed with 1.1"
         }
       ]
     },
@@ -322,20 +359,26 @@
           "task": "Create app.css with Tailwind imports",
           "target": "src/app.css",
           "content": "@tailwind base; @tailwind components; @tailwind utilities; + custom styles",
-          "status": "pending"
+          "status": "done",
+          "commit": "97397c8",
+          "note": "Completed with 1.1"
         },
         {
           "id": "7.2",
           "task": "Add fonts configuration",
           "details": "JetBrains Mono, Space Grotesk - configure in app.html or layout",
-          "status": "pending"
+          "status": "done",
+          "commit": "97397c8",
+          "note": "Completed with 1.1"
         },
         {
           "id": "7.3",
           "task": "Create app.html",
           "target": "src/app.html",
           "details": "SvelteKit HTML template with %sveltekit.head% and %sveltekit.body%",
-          "status": "pending"
+          "status": "done",
+          "commit": "97397c8",
+          "note": "Completed with 1.1"
         }
       ]
     },
@@ -348,19 +391,25 @@
           "id": "8.1",
           "task": "Create svelte.config.js",
           "details": "Configure adapter, preprocess, alias for $lib",
-          "status": "pending"
+          "status": "done",
+          "commit": "97397c8",
+          "note": "Completed with 1.1"
         },
         {
           "id": "8.2",
           "task": "Create vite.config.ts for SvelteKit",
           "details": "Configure SvelteKit plugin, proxy for Chart-IMG API",
-          "status": "pending"
+          "status": "done",
+          "commit": "97397c8",
+          "note": "Completed with 1.1"
         },
         {
           "id": "8.3",
           "task": "Update tsconfig.json",
           "details": "Add SvelteKit paths, update extends",
-          "status": "pending"
+          "status": "done",
+          "commit": "97397c8",
+          "note": "Completed with 1.1"
         }
       ]
     },
