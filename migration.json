@@ -1,0 +1,477 @@
+{
+  "migration": {
+    "name": "React to SvelteKit + Svelte 5 Migration",
+    "source": "React 19 + Vite + Tailwind",
+    "target": "SvelteKit 2 + Svelte 5 + Tailwind",
+    "created": "2025-12-21"
+  },
+  "phases": [
+    {
+      "phase": 1,
+      "name": "Project Setup",
+      "priority": "critical",
+      "steps": [
+        {
+          "id": "1.1",
+          "task": "Initialize SvelteKit project structure",
+          "details": "Create src/routes/, src/lib/, src/lib/components/, src/lib/services/, src/lib/utils/",
+          "status": "pending"
+        },
+        {
+          "id": "1.2",
+          "task": "Configure Tailwind CSS for SvelteKit",
+          "details": "Update tailwind.config.js content paths, add postcss.config.js, import in app.css",
+          "status": "pending"
+        },
+        {
+          "id": "1.3",
+          "task": "Configure environment variables",
+          "details": "Move from Vite define to $env/static/private and $env/dynamic/public. Update .env handling",
+          "env_mapping": {
+            "GEMINI_API_KEY": "PUBLIC_GEMINI_API_KEY (client needs it)",
+            "CHART_IMG_API_KEY": "CHART_IMG_API_KEY (server-side proxy)",
+            "SUPADATA_API_KEY": "SUPADATA_API_KEY (server-side proxy)",
+            "VITE_DEBUG": "PUBLIC_DEBUG"
+          },
+          "status": "pending"
+        },
+        {
+          "id": "1.4",
+          "task": "Update package.json dependencies",
+          "add": ["@sveltejs/kit", "@sveltejs/adapter-auto", "svelte", "@google/genai", "zod", "zod-to-json-schema", "lucide-svelte"],
+          "remove": ["react", "react-dom", "@types/react", "@types/react-dom", "lucide-react"],
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "phase": 2,
+      "name": "Types Migration",
+      "priority": "high",
+      "source_file": "types.ts",
+      "target_file": "src/lib/types.ts",
+      "steps": [
+        {
+          "id": "2.1",
+          "task": "Move types.ts to $lib",
+          "details": "Copy types.ts to src/lib/types.ts - no changes needed, pure TypeScript",
+          "changes": "none",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "phase": 3,
+      "name": "Utils Migration",
+      "priority": "high",
+      "steps": [
+        {
+          "id": "3.1",
+          "task": "Migrate apiKeyStorage.ts",
+          "source": "utils/apiKeyStorage.ts",
+          "target": "src/lib/utils/apiKeyStorage.ts",
+          "changes": [
+            "Add browser guard: import { browser } from '$app/environment'",
+            "Wrap localStorage calls with if (browser) checks",
+            "Return null/0 defaults when SSR"
+          ],
+          "svelte_pattern": "SSR-safe localStorage access",
+          "status": "pending"
+        },
+        {
+          "id": "3.2",
+          "task": "Migrate debugLogger.ts",
+          "source": "utils/debugLogger.ts",
+          "target": "src/lib/utils/debugLogger.ts",
+          "changes": [
+            "Replace import.meta.env.VITE_DEBUG with $env/dynamic/public",
+            "Add browser guard for document.createElement",
+            "Wrap DOM operations with if (browser) checks"
+          ],
+          "svelte_pattern": "SSR-safe DOM access + env vars",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "phase": 4,
+      "name": "Services Migration",
+      "priority": "high",
+      "notes": "Services are mostly pure TypeScript, minimal changes needed",
+      "steps": [
+        {
+          "id": "4.1",
+          "task": "Migrate geminiService.ts",
+          "source": "services/geminiService.ts",
+          "target": "src/lib/services/geminiService.ts",
+          "changes": [
+            "Update import path: '../types' -> '$lib/types'",
+            "Update import path: '../utils/debugLogger' -> '$lib/utils/debugLogger'"
+          ],
+          "status": "pending"
+        },
+        {
+          "id": "4.2",
+          "task": "Migrate chartImgService.ts",
+          "source": "services/chartImgService.ts",
+          "target": "src/lib/services/chartImgService.ts",
+          "changes": [
+            "Update import paths to $lib",
+            "Replace process.env.CHART_IMG_API_KEY with server-side endpoint OR $env",
+            "Consider moving API call to +server.ts endpoint for security"
+          ],
+          "security_note": "API key should be server-side only - create API route",
+          "status": "pending"
+        },
+        {
+          "id": "4.3",
+          "task": "Migrate chartSymbolService.ts",
+          "source": "services/chartSymbolService.ts",
+          "target": "src/lib/services/chartSymbolService.ts",
+          "changes": [
+            "Update import paths to $lib"
+          ],
+          "status": "pending"
+        },
+        {
+          "id": "4.4",
+          "task": "Migrate supadataService.ts",
+          "source": "services/supadataService.ts",
+          "target": "src/lib/services/supadataService.ts",
+          "changes": [
+            "Update import paths to $lib",
+            "Replace process.env.SUPADATA_API_KEY - consider server endpoint"
+          ],
+          "security_note": "API key should be server-side only - create API route",
+          "status": "pending"
+        },
+        {
+          "id": "4.5",
+          "task": "Create server-side API routes",
+          "target_files": [
+            "src/routes/api/chart/+server.ts",
+            "src/routes/api/metadata/+server.ts"
+          ],
+          "details": "Move API key usage to server endpoints to protect secrets",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "phase": 5,
+      "name": "Components Migration",
+      "priority": "high",
+      "notes": "Convert React components to Svelte 5 using runes",
+      "react_to_svelte_patterns": {
+        "useState": "$state(initialValue)",
+        "useEffect_mount": "$effect(() => { ... })",
+        "useEffect_cleanup": "$effect(() => { return () => cleanup() })",
+        "useRef_dom": "bind:this={element}",
+        "useRef_mutable": "$state(value) without reactivity",
+        "props_interface": "interface Props { ... } + let { prop }: Props = $props()",
+        "event_handlers": "on:click or onclick={handler}",
+        "conditional": "{#if condition}...{/if}",
+        "list_render": "{#each items as item}...{/each}",
+        "className": "class"
+      },
+      "steps": [
+        {
+          "id": "5.1",
+          "task": "Migrate VideoUpload component",
+          "source": "components/VideoUpload.tsx",
+          "target": "src/lib/components/VideoUpload.svelte",
+          "react_hooks": ["useState x2"],
+          "svelte_conversion": {
+            "url_state": "let url = $state('')",
+            "isFocused_state": "let isFocused = $state(false)",
+            "props": "interface Props { onInputSelected: (input: string | File) => void; isLoading: boolean }",
+            "form_submit": "on:submit|preventDefault"
+          },
+          "status": "pending"
+        },
+        {
+          "id": "5.2",
+          "task": "Migrate TradeCard component",
+          "source": "components/TradeCard.tsx",
+          "target": "src/lib/components/TradeCard.svelte",
+          "react_hooks": [],
+          "svelte_conversion": {
+            "props": "interface Props { idea: TradeIdea }",
+            "derived": "Use $derived() for isLong, isShort, accentColor etc"
+          },
+          "notes": "Stateless component - straightforward conversion",
+          "status": "pending"
+        },
+        {
+          "id": "5.3",
+          "task": "Migrate MarketAnalysisCard component",
+          "source": "components/MarketAnalysisCard.tsx",
+          "target": "src/lib/components/MarketAnalysisCard.svelte",
+          "react_hooks": [],
+          "svelte_conversion": {
+            "props": "interface Props { data: MarketAnalysis }",
+            "derived": "$derived() for isBullish, isBearish, sentimentColor etc"
+          },
+          "notes": "Stateless component - straightforward conversion",
+          "status": "pending"
+        },
+        {
+          "id": "5.4",
+          "task": "Migrate ApiKeyModal component",
+          "source": "components/ApiKeyModal.tsx",
+          "target": "src/lib/components/ApiKeyModal.svelte",
+          "react_hooks": ["useState x2"],
+          "svelte_conversion": {
+            "apiKey_state": "let apiKey = $state('')",
+            "showKey_state": "let showKey = $state(false)",
+            "props": "interface Props { isOpen: boolean; onClose: () => void; onSubmit: (key: string) => void }",
+            "conditional_render": "{#if isOpen}...{/if}"
+          },
+          "status": "pending"
+        },
+        {
+          "id": "5.5",
+          "task": "Migrate AnalysisLogStream component",
+          "source": "components/AnalysisLogStream.tsx",
+          "target": "src/lib/components/AnalysisLogStream.svelte",
+          "react_hooks": ["useState x4", "useEffect x4", "useRef x2"],
+          "complexity": "high",
+          "svelte_conversion": {
+            "logs_state": "let logs = $state<LogEntry[]>([])",
+            "progress_state": "let progress = $state(0)",
+            "currentLogIndex_state": "let currentLogIndex = $state(0)",
+            "elapsedTime_state": "let elapsedTime = $state(0)",
+            "dom_ref": "let logContainer: HTMLDivElement; bind:this={logContainer}",
+            "startTime_ref": "const startTime = Date.now() (module scope)",
+            "effects": "Multiple $effect() blocks for timers and scroll",
+            "cleanup": "$effect returns cleanup function for clearTimeout/clearInterval"
+          },
+          "notes": "Most complex component - multiple effects with cleanup",
+          "status": "pending"
+        },
+        {
+          "id": "5.6",
+          "task": "Migrate VideoMetadataCard component",
+          "source": "components/VideoMetadataCard.tsx",
+          "target": "src/lib/components/VideoMetadataCard.svelte",
+          "react_hooks": [],
+          "svelte_conversion": {
+            "props": "interface Props { metadata: VideoMetadata }"
+          },
+          "notes": "Stateless component - straightforward conversion",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "phase": 6,
+      "name": "Main Page Migration (App.tsx)",
+      "priority": "critical",
+      "source": "App.tsx",
+      "target": "src/routes/+page.svelte",
+      "steps": [
+        {
+          "id": "6.1",
+          "task": "Create +page.svelte from App.tsx",
+          "react_hooks": ["useState x7"],
+          "svelte_conversion": {
+            "result": "let result = $state<AnalysisResult | null>(null)",
+            "isLoading": "let isLoading = $state(false)",
+            "error": "let error = $state<string | null>(null)",
+            "showApiKeyModal": "let showApiKeyModal = $state(false)",
+            "pendingInput": "let pendingInput = $state<string | File | null>(null)",
+            "analysisCount": "let analysisCount = $state(getAnalysisCount())",
+            "videoMetadata": "let videoMetadata = $state<VideoMetadata | null>(null)"
+          },
+          "status": "pending"
+        },
+        {
+          "id": "6.2",
+          "task": "Convert async handlers",
+          "details": "runAnalysis, handleInputSelected, handleApiKeySubmit stay as async functions",
+          "status": "pending"
+        },
+        {
+          "id": "6.3",
+          "task": "Update template syntax",
+          "changes": [
+            "className -> class",
+            "{condition && <Component/>} -> {#if condition}<Component/>{/if}",
+            "array.map() -> {#each array as item}",
+            "Import Lucide icons from lucide-svelte",
+            "Update component imports to .svelte"
+          ],
+          "status": "pending"
+        },
+        {
+          "id": "6.4",
+          "task": "Create +layout.svelte",
+          "target": "src/routes/+layout.svelte",
+          "details": "Add global styles, fonts, and app shell",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "phase": 7,
+      "name": "Static Assets & Styling",
+      "priority": "medium",
+      "steps": [
+        {
+          "id": "7.1",
+          "task": "Create app.css with Tailwind imports",
+          "target": "src/app.css",
+          "content": "@tailwind base; @tailwind components; @tailwind utilities; + custom styles",
+          "status": "pending"
+        },
+        {
+          "id": "7.2",
+          "task": "Add fonts configuration",
+          "details": "JetBrains Mono, Space Grotesk - configure in app.html or layout",
+          "status": "pending"
+        },
+        {
+          "id": "7.3",
+          "task": "Create app.html",
+          "target": "src/app.html",
+          "details": "SvelteKit HTML template with %sveltekit.head% and %sveltekit.body%",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "phase": 8,
+      "name": "Build Configuration",
+      "priority": "medium",
+      "steps": [
+        {
+          "id": "8.1",
+          "task": "Create svelte.config.js",
+          "details": "Configure adapter, preprocess, alias for $lib",
+          "status": "pending"
+        },
+        {
+          "id": "8.2",
+          "task": "Create vite.config.ts for SvelteKit",
+          "details": "Configure SvelteKit plugin, proxy for Chart-IMG API",
+          "status": "pending"
+        },
+        {
+          "id": "8.3",
+          "task": "Update tsconfig.json",
+          "details": "Add SvelteKit paths, update extends",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "phase": 9,
+      "name": "Testing & Validation",
+      "priority": "critical",
+      "steps": [
+        {
+          "id": "9.1",
+          "task": "Run npm run dev",
+          "validation": "App starts without errors",
+          "status": "pending"
+        },
+        {
+          "id": "9.2",
+          "task": "Test YouTube URL analysis flow",
+          "validation": "Full flow works: URL input -> metadata display -> analysis -> results",
+          "status": "pending"
+        },
+        {
+          "id": "9.3",
+          "task": "Test API key modal",
+          "validation": "Modal opens, saves key, persists across refresh",
+          "status": "pending"
+        },
+        {
+          "id": "9.4",
+          "task": "Test chart generation",
+          "validation": "Trade cards display with chart images",
+          "status": "pending"
+        },
+        {
+          "id": "9.5",
+          "task": "Run npm run build",
+          "validation": "Production build succeeds",
+          "status": "pending"
+        }
+      ]
+    }
+  ],
+  "file_mapping": {
+    "App.tsx": "src/routes/+page.svelte",
+    "index.tsx": "DELETE (SvelteKit handles entry)",
+    "index.html": "src/app.html",
+    "types.ts": "src/lib/types.ts",
+    "services/geminiService.ts": "src/lib/services/geminiService.ts",
+    "services/chartImgService.ts": "src/lib/services/chartImgService.ts",
+    "services/chartSymbolService.ts": "src/lib/services/chartSymbolService.ts",
+    "services/supadataService.ts": "src/lib/services/supadataService.ts",
+    "utils/apiKeyStorage.ts": "src/lib/utils/apiKeyStorage.ts",
+    "utils/debugLogger.ts": "src/lib/utils/debugLogger.ts",
+    "components/VideoUpload.tsx": "src/lib/components/VideoUpload.svelte",
+    "components/TradeCard.tsx": "src/lib/components/TradeCard.svelte",
+    "components/MarketAnalysisCard.tsx": "src/lib/components/MarketAnalysisCard.svelte",
+    "components/ApiKeyModal.tsx": "src/lib/components/ApiKeyModal.svelte",
+    "components/AnalysisLogStream.tsx": "src/lib/components/AnalysisLogStream.svelte",
+    "components/VideoMetadataCard.tsx": "src/lib/components/VideoMetadataCard.svelte"
+  },
+  "new_files": [
+    "src/routes/+layout.svelte",
+    "src/routes/api/chart/+server.ts",
+    "src/routes/api/metadata/+server.ts",
+    "src/app.html",
+    "src/app.css",
+    "svelte.config.js",
+    "vite.config.ts"
+  ],
+  "critical_patterns": {
+    "svelte5_runes": {
+      "state": "$state(initialValue) - replaces useState",
+      "derived": "$derived(expression) - computed values",
+      "effect": "$effect(() => { ... }) - replaces useEffect",
+      "props": "let { prop1, prop2 }: Props = $props()",
+      "bindable": "$bindable() - for two-way binding props"
+    },
+    "ssr_safety": {
+      "browser_check": "import { browser } from '$app/environment'",
+      "pattern": "if (browser) { /* localStorage, document, window */ }"
+    },
+    "imports": {
+      "icons": "import { IconName } from 'lucide-svelte'",
+      "lib": "import { thing } from '$lib/path'"
+    }
+  },
+  "risk_areas": [
+    {
+      "area": "AnalysisLogStream.svelte",
+      "risk": "Complex timer/effect management",
+      "mitigation": "Test thoroughly, ensure cleanup in $effect return"
+    },
+    {
+      "area": "API Keys in services",
+      "risk": "Exposing secrets client-side",
+      "mitigation": "Move Chart-IMG and Supadata calls to server endpoints"
+    },
+    {
+      "area": "localStorage SSR",
+      "risk": "Server-side rendering errors",
+      "mitigation": "Use browser check from $app/environment"
+    }
+  ],
+  "execution_order": [
+    "Phase 1: Project Setup",
+    "Phase 2: Types (dependency for everything)",
+    "Phase 3: Utils (dependency for services)",
+    "Phase 4: Services (dependency for components)",
+    "Phase 5: Components (can be parallel)",
+    "Phase 6: Main Page",
+    "Phase 7: Styling",
+    "Phase 8: Build Config",
+    "Phase 9: Testing"
+  ]
+}
