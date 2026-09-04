@@ -1,12 +1,31 @@
 {
   "project": "TradeScout AI",
   "version": "1.0.0",
-  "lastUpdated": "2025-01-19",
+  "lastUpdated": "2026-09-03",
   "techStack": {
-    "frontend": ["React 19", "Vite", "Tailwind CSS", "lucide-react"],
-    "backend": ["Node.js", "Drizzle ORM", "Postgres"],
-    "ai": ["Google Gemini", "Claude Haiku", "GPT-4.1 Mini"],
-    "integrations": ["Supadata", "Cloudflare R2", "Nano Banana", "PGVector"]
+    "_note": "`current` is what ships today, verified against package.json and src/. `planned` entries are aspirational and tracked as status:planned features below — do not write code against them.",
+    "current": {
+      "frontend": ["SvelteKit 2", "Svelte 5 (runes)", "Vite 6", "TypeScript 5.8", "Tailwind CSS 3 (PostCSS)", "lucide-svelte"],
+      "backend": [],
+      "ai": [
+        "@google/genai",
+        "gemini-3-pro-preview (video analysis, geminiService)",
+        "gemini-2.0-flash (symbol lookup, chartSymbolService)"
+      ],
+      "integrations": ["Supadata (YouTube metadata)", "Chart-IMG (chart rendering)"],
+      "schema": ["zod 4", "zod-to-json-schema"],
+      "deployment": ["Railway", "@sveltejs/adapter-auto (does not detect Railway — needs adapter-node)"]
+    },
+    "planned": {
+      "backend": ["Node.js", "Drizzle ORM", "Postgres"],
+      "ai": ["Claude Haiku", "GPT-4.1 Mini"],
+      "integrations": ["Cloudflare R2", "Nano Banana", "PGVector"]
+    },
+    "constraints": [
+      "No server routes exist (src/routes/api/*/+server.ts absent), so there is no backend layer of any kind.",
+      "No database, ORM, or persistence — all state is in-memory or localStorage.",
+      "CHART_IMG_API_KEY and SUPADATA_API_KEY are inlined into the client bundle by Vite define; the Gemini key is user-supplied at runtime via ApiKeyModal."
+    ]
   },
   "features": [
     {

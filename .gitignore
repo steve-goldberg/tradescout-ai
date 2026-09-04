@@ -30,3 +30,9 @@ npm-debug.log*
 img-logs/
 scripts/
 utils/debugLogger.ts
+
+# llms.txt symlinks (point outside the repo)
+docs/
+
+# graphify generated artifacts
+graphify-out/
