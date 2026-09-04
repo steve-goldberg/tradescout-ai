@@ -41,12 +41,13 @@ Create `.env.local` with:
 ```
 CHART_IMG_API_KEY=your_key_here
 SUPADATA_API_KEY=your_key_here
+PUBLIC_GEMINI_API_KEY=
 DEBUG=true
 ```
 
-These are inlined into the client bundle by Vite's `define` config (`vite.config.ts`) and read as `process.env.*` inside services. There is no server-side route protecting them — see "Known Gaps".
+`CHART_IMG_API_KEY` and `SUPADATA_API_KEY` are inlined into the client bundle by Vite's `define` config (`vite.config.ts`) and read as `process.env.*` inside services. There is no server-side route protecting them — see "Known Gaps".
 
-**The Gemini API key is not an env var.** Users paste it into `ApiKeyModal` at runtime; it is stored in `localStorage` under `tradescout_gemini_api_key` and passed explicitly into `analyzeVideoForTrades`. The `process.env.GEMINI_API_KEY` entry in `vite.config.ts` is unused.
+**Gemini key resolution** lives in `src/lib/utils/apiKeyStorage.ts`. `PUBLIC_GEMINI_API_KEY` (read at runtime via `$env/dynamic/public`; set as a Railway service variable) is used first. When it is empty, as it should be locally, the app falls back to the key the user pastes into `ApiKeyModal`, stored in `localStorage` under `tradescout_gemini_api_key`. Either way the key is passed explicitly into `analyzeVideoForTrades`. The `process.env.GEMINI_API_KEY` entry in `vite.config.ts` is unused.
 
 ## Architecture
 
@@ -85,11 +86,11 @@ These are inlined into the client bundle by Vite's `define` config (`vite.config
 
 ### Analysis Pipeline
 
-`handleAnalyze` → (URL only) fetch video metadata → `analyzeVideoForTrades` → `enrichTradesWithSymbols` → `generateChartsForTrades` → render.
+`handleInputSelected` → (URL only) start the Supadata metadata fetch without awaiting it → `analyzeVideoForTrades` → `enrichTradesWithSymbols` → await the metadata promise → `generateChartsForTrades` → render. `VideoMetadataCard` appears as soon as the metadata promise resolves, while Gemini is still running. The key badge in the top bar mirrors a `$state` (`hasKey`) that is set when the modal saves a key; a bare `hasApiKey()` call in the template would never re-render.
 
 ### AI Model Configuration
 
-- Model: `gemini-3-pro-preview`
+- Model: `gemini-3.1-pro-preview` for video analysis (`gemini-3-pro-preview` was retired); `gemini-3.5-flash` for symbol enrichment
 - Uses `responseMimeType: "application/json"` with `responseSchema` for structured output
 - `mediaResolution: "MEDIA_RESOLUTION_HIGH"` for video analysis
 
@@ -113,7 +114,7 @@ These are inlined into the client bundle by Vite's `define` config (`vite.config
 
 Pushing to the `sveltekit` branch on the `main` remote (github.com/steve-goldberg/tradescout-ai) triggers an autodeploy on Railway.
 
-`svelte.config.js` still uses `@sveltejs/adapter-auto`, which cannot detect Railway — the build succeeds but prints "Could not detect a supported production environment" and emits no runnable server. Railway needs `@sveltejs/adapter-node` plus a `start` script.
+`svelte.config.js` uses `@sveltejs/adapter-node`. `npm run build` writes a standalone server to `build/` (gitignored) and `npm start` runs it with `node build`, listening on Railway's `PORT`. Railway's Railpack builder runs `npm run build` followed by `npm start`.
 
 ## Styling
 
@@ -129,5 +130,5 @@ Dark trading terminal aesthetic:
 Tracked in `migration.json` (phase status) and GitHub issues:
 
 - **Phase 4.5 deferred**: no `src/routes/api/*/+server.ts` proxies, so `CHART_IMG_API_KEY` and `SUPADATA_API_KEY` ship in the client bundle.
-- **Phase 9 incomplete**: the YouTube flow, API key modal, and chart generation have not been verified since the migration.
-- **Lost fix**: `8c48816` on `react-legacy` made the Supadata metadata fetch run in parallel with Gemini analysis. The port in `+page.svelte` still `await`s metadata before starting analysis, so the log stream sits idle.
+- **Phase 9.4 skipped**: chart generation is not verified. Chart-IMG returned 403 during the September 2026 sign-off; trade cards render without chart images. Tracked separately from the migration.
+- **Symbol enrichment is best-effort**: `gemini-3.5-flash` occasionally returns 503; the failure is caught and `chartImgService` falls back to its own ticker mapping.

@@ -21,17 +21,28 @@
   let pendingInput = $state<string | File | null>(null);
   let analysisCount = $state(getAnalysisCount());
   let videoMetadata = $state<VideoMetadata | null>(null);
+  // Reactive mirror of hasApiKey(): localStorage is not tracked by runes, so the
+  // badge only updates when this state changes (set on modal submit).
+  let hasKey = $state(hasApiKey());
 
-  async function runAnalysis(input: string | File, apiKey: string, metadata: VideoMetadata | null) {
+  // In-flight Supadata fetch for the current submission. Runs in parallel with
+  // Gemini; kept here so a key entered via the modal can still reuse it.
+  let metadataPromise: Promise<VideoMetadata | null> = Promise.resolve(null);
+
+  async function runAnalysis(input: string | File, apiKey: string, pendingMetadata: Promise<VideoMetadata | null>) {
     result = null;
     error = null;
     isLoading = true;
 
     try {
+      // Start Gemini analysis immediately (don't wait for metadata)
       const data = await analyzeVideoForTrades(input, apiKey);
 
       // Enrich trades with TradingView symbols using Gemini Flash
       const tradesWithSymbols = await enrichTradesWithSymbols(data.trades, apiKey);
+
+      // Now await metadata (probably already done by now)
+      const metadata = await pendingMetadata;
 
       // Add video publish date for Chart-IMG vertical line (GitHub #1)
       const tradesWithMetadata = tradesWithSymbols.map(trade => ({
@@ -61,18 +72,20 @@
     result = null;
     error = null;
 
-    // If it's a URL, fetch metadata first (needed for chart vertical line)
-    let metadata: VideoMetadata | null = null;
+    // Start metadata fetch in parallel (fire-and-forget for UI, pass Promise for charts)
+    metadataPromise = Promise.resolve(null);
     if (typeof input === 'string') {
-      metadata = await fetchVideoMetadata(input);
-      if (metadata) {
-        videoMetadata = metadata;
-      }
+      const fetching = fetchVideoMetadata(input);
+      metadataPromise = fetching;
+      // Update UI as soon as metadata arrives, unless a newer submission superseded it
+      fetching.then(m => {
+        if (m && metadataPromise === fetching) videoMetadata = m;
+      });
     }
 
-    if (hasApiKey()) {
-      const apiKey = getApiKey()!;
-      await runAnalysis(input, apiKey, metadata);
+    const apiKey = getApiKey();
+    if (apiKey) {
+      await runAnalysis(input, apiKey, metadataPromise);
     } else {
       pendingInput = input;
       showApiKeyModal = true;
@@ -81,10 +94,12 @@
 
   async function handleApiKeySubmit(apiKey: string) {
     setApiKey(apiKey);
+    hasKey = true;
     showApiKeyModal = false;
 
     if (pendingInput) {
-      await runAnalysis(pendingInput, apiKey, videoMetadata);
+      // Metadata fetch started before the modal opened; reuse its promise
+      await runAnalysis(pendingInput, apiKey, metadataPromise);
       pendingInput = null;
     }
   }
@@ -107,8 +122,8 @@
       Secure Connection // Encrypted
     </span>
     <span class="flex items-center gap-3">
-      <span class={hasApiKey() ? 'text-emerald-500' : 'text-slate-600'}>
-        {hasApiKey() ? '● API Key Active' : '○ No API Key'}
+      <span class={hasKey ? 'text-emerald-500' : 'text-slate-600'}>
+        {hasKey ? '● API Key Active' : '○ No API Key'}
       </span>
       <span class="text-slate-600">//</span>
       <span>Videos Analyzed: {analysisCount}</span>

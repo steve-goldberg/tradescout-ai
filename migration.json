@@ -393,7 +393,7 @@
           "details": "Configure adapter, preprocess, alias for $lib",
           "status": "done",
           "commit": "97397c8",
-          "note": "Completed with 1.1"
+          "note": "Completed with 1.1. Adapter switched from adapter-auto to adapter-node in 9.5 (Railway needs a runnable Node server)."
         },
         {
           "id": "8.2",
@@ -429,25 +429,29 @@
           "id": "9.2",
           "task": "Test YouTube URL analysis flow",
           "validation": "Full flow works: URL input -> metadata display -> analysis -> results",
-          "status": "pending"
+          "status": "done",
+          "result": "2026-09-03, local dev server, youtube.com/watch?v=gK_Blv_HhE4 (7:52): metadata card rendered immediately (Supadata now runs in parallel with Gemini, restoring react-legacy 8c48816), log stream ran, 2 trade cards rendered with entry/target/stop prices. Required switching gemini-3-pro-preview (404, retired) to gemini-3.1-pro-preview and gemini-2.0-flash (shut down 2026-06-01) to gemini-3.5-flash."
         },
         {
           "id": "9.3",
           "task": "Test API key modal",
           "validation": "Modal opens, saves key, persists across refresh",
-          "status": "pending"
+          "status": "done",
+          "result": "2026-09-03, PUBLIC_GEMINI_API_KEY empty: badge read 'No API Key'; URL submit opened the modal; saving a key flipped the badge to 'API Key Active' with no reload (badge now mirrors a $state, not a bare localStorage read); after reload the badge stayed Active, no modal, localStorage has tradescout_gemini_api_key."
         },
         {
           "id": "9.4",
           "task": "Test chart generation",
           "validation": "Trade cards display with chart images",
-          "status": "pending"
+          "status": "skipped",
+          "note": "Chart-IMG rendering is out of scope for the migration sign-off and tracked separately; trade cards render without chart images."
         },
         {
           "id": "9.5",
           "task": "Run npm run build",
           "validation": "Production build succeeds",
-          "status": "pending"
+          "status": "done",
+          "result": "2026-09-03: npm run build exits 0 with @sveltejs/adapter-node 5.5.7 ('Using @sveltejs/adapter-node ... done'), output in build/, started with `npm start` (node build). No adapter-auto 'Could not detect a supported production environment' warning."
         }
       ]
     }

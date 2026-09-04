@@ -52,7 +52,7 @@ ${trades.map((t, i) => `${i}: "${t.ticker}" (${t.asset})`).join('\n')}`;
     });
 
     const response = await ai.models.generateContent({
-      model: "gemini-2.0-flash",
+      model: "gemini-3.5-flash", // gemini-2.0-flash shut down 2026-06-01; docs name 3.5 Flash as the migration target
       contents: prompt,
       config: {
         responseMimeType: "application/json",

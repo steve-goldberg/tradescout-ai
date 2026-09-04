@@ -36,3 +36,6 @@ docs/
 
 # graphify generated artifacts
 graphify-out/
+
+# Playwright MCP session artifacts (snapshots, console logs)
+.playwright-mcp/

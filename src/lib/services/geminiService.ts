@@ -27,7 +27,7 @@ export const analyzeVideoForTrades = async (
     }
 
     const ai = new GoogleGenAI({ apiKey });
-    const modelId = "gemini-3-pro-preview"; // Using high-intelligence model for video analysis
+    const modelId = "gemini-3.1-pro-preview"; // gemini-3-pro-preview was retired (404 as of Sep 2026)
 
     let fileUri: string;
     let mimeType: string;
