@@ -47,7 +47,7 @@ DEBUG=true
 
 `CHART_IMG_API_KEY` and `SUPADATA_API_KEY` are inlined into the client bundle by Vite's `define` config (`vite.config.ts`) and read as `process.env.*` inside services. There is no server-side route protecting them — see "Known Gaps".
 
-**Gemini key resolution** lives in `src/lib/utils/apiKeyStorage.ts`. `PUBLIC_GEMINI_API_KEY` (read at runtime via `$env/dynamic/public`; set as a Railway service variable) is used first. When it is empty, as it should be locally, the app falls back to the key the user pastes into `ApiKeyModal`, stored in `localStorage` under `tradescout_gemini_api_key`. Either way the key is passed explicitly into `analyzeVideoForTrades`. The `process.env.GEMINI_API_KEY` entry in `vite.config.ts` is unused.
+**Gemini key resolution** lives in `src/lib/utils/apiKeyStorage.ts`. `PUBLIC_GEMINI_API_KEY` (read at runtime via `$env/dynamic/public`; set on the deployment host) is used first. Because it is `PUBLIC_`, it reaches every visitor's browser. The badge in the top bar only checks that a key exists, not that Gemini accepts it. When it is empty, as it should be locally, the app falls back to the key the user pastes into `ApiKeyModal`, stored in `localStorage` under `tradescout_gemini_api_key`. Either way the key is passed explicitly into `analyzeVideoForTrades`. The `process.env.GEMINI_API_KEY` entry in `vite.config.ts` is unused.
 
 ## Architecture
 
@@ -112,9 +112,9 @@ DEBUG=true
 
 ## Deployment
 
-Pushing to the `sveltekit` branch on the `main` remote (github.com/steve-goldberg/tradescout-ai) triggers an autodeploy on Railway.
+The app is not deployed anywhere. The Railway project was deleted in November 2026, so pushing to `sveltekit` deploys nothing. The plan, with no date set, is a Docker image self-hosted on Dokploy. The trade ledger's SQLite database will need a persistent volume there.
 
-`svelte.config.js` uses `@sveltejs/adapter-node`. `npm run build` writes a standalone server to `build/` (gitignored) and `npm start` runs it with `node build`, listening on Railway's `PORT`. Railway's Railpack builder runs `npm run build` followed by `npm start`.
+`svelte.config.js` uses `@sveltejs/adapter-node`. `npm run build` writes a standalone server to `build/` (gitignored) and `npm start` runs it with `node build`, listening on `PORT`.
 
 ## Styling
 
@@ -130,5 +130,6 @@ Dark trading terminal aesthetic:
 Tracked in `migration.json` (phase status) and GitHub issues:
 
 - **Phase 4.5 deferred**: no `src/routes/api/*/+server.ts` proxies, so `CHART_IMG_API_KEY` and `SUPADATA_API_KEY` ship in the client bundle.
+- **Gemini key needs rotation**: the key last deployed as `PUBLIC_GEMINI_API_KEY` returns `API_KEY_INVALID` (checked November 2026). A new one is needed before analysis works outside a key pasted into `ApiKeyModal`. Keep it out of `PUBLIC_` if possible.
 - **Phase 9.4 skipped**: chart generation is not verified. Chart-IMG returned 403 during the September 2026 sign-off; trade cards render without chart images. Tracked separately from the migration.
 - **Symbol enrichment is best-effort**: `gemini-3.5-flash` occasionally returns 503; the failure is caught and `chartImgService` falls back to its own ticker mapping.
